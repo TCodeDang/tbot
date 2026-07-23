@@ -1,1631 +1,934 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TCODE | Hệ Sinh Thái Bot Trading</title>
-  <meta name="description" content="TCODE - Chuyên gia EA & Bot Trading. Cung cấp bot trade, code bot theo yêu cầu, tư duy & vận hành hệ bot.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    /* ===== TOKENS ===== */
-    :root {
-      --bg-0:       #060911;
-      --bg-1:       #0A0E1A;
-      --bg-2:       #111827;
-      --bg-3:       #1A2235;
-      --bg-card:    #0F1624;
-      --border:     rgba(255,255,255,0.07);
-      --border-hi:  rgba(245,158,11,0.25);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CityBot — Nền tảng Trading Bot MT5 | TCode</title>
+<meta name="description" content="CityBot - Hệ thống Expert Advisor đa module cho MT5. Phát triển bởi TCode. Hedging, SeasonX, MoneyTick, Tỉa lệnh, Thoát lệnh và Rải lệnh Zone.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── ROOT ─── */
+:root {
+  --bg-primary: #05080f;
+  --bg-secondary: #0a0f1a;
+  --bg-card: #0d1422;
+  --bg-card-hover: #121c30;
+  --border-color: #1a2740;
+  --border-light: #243353;
+  --text-primary: #e8edf5;
+  --text-secondary: #8ea4c8;
+  --text-muted: #4a5a7a;
+  --accent-gold: #f5b342;
+  --accent-gold-glow: rgba(245, 179, 66, 0.10);
+  --accent-blue: #4a8bf7;
+  --accent-purple: #8b5cf6;
+  --accent-cyan: #22d3ee;
+  --accent-green: #2ed198;
+  --accent-red: #ef5a6a;
+  --gradient-gold: linear-gradient(135deg, #f5b342, #e08a2e);
+  --gradient-cyber: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  --shadow-card: 0 8px 40px rgba(0,0,0,0.6);
+  --radius: 12px;
+  --radius-lg: 24px;
+  --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Sora', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+body { background:var(--bg-primary); color:var(--text-primary); font-family:var(--font-body); line-height:1.6; overflow-x:hidden; min-height:100vh; letter-spacing:-0.01em; }
+::selection { background:var(--accent-gold); color:#05080f; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--bg-primary); }
+::-webkit-scrollbar-thumb { background:var(--accent-gold); border-radius:10px; }
 
-      --brand-1:    #f59e0b;
-      --brand-2:    #f97316;
-      --brand-3:    #ef4444;
-      --brand-grad: linear-gradient(135deg, #00FF88, #00FF88, #00FF88);
-      --brand-dim:  rgba(245,158,11,0.12);
-      --brand-glow: rgba(245,158,11,0.08);
+/* ─── UNIVERSE BACKGROUND ─── */
+#universe {
+  position:fixed; inset:0; z-index:0;
+  background: radial-gradient(ellipse at 20% 30%, rgba(34, 211, 238, 0.04), transparent 50%),
+              radial-gradient(ellipse at 80% 70%, rgba(139, 92, 246, 0.04), transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(245, 179, 66, 0.02), transparent 70%),
+              var(--bg-primary);
+  overflow:hidden;
+}
+.star { position:absolute; background:white; border-radius:50%; animation:twinkle var(--duration) ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.2;transform:scale(1);} 50%{opacity:1;transform:scale(1.3);} }
+.nebula { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.15; }
+.nebula-1 { width:600px; height:600px; top:-200px; right:-150px; background:radial-gradient(circle, rgba(245,179,66,0.2), transparent 70%); animation:nebula-drift 30s ease-in-out infinite; }
+.nebula-2 { width:500px; height:500px; bottom:-150px; left:-100px; background:radial-gradient(circle, rgba(139,92,246,0.15), transparent 70%); animation:nebula-drift 25s ease-in-out infinite reverse; }
+.nebula-3 { width:400px; height:400px; top:40%; left:55%; background:radial-gradient(circle, rgba(34,211,238,0.10), transparent 70%); animation:nebula-drift 35s ease-in-out infinite; }
+@keyframes nebula-drift { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(40px,-30px) scale(1.1);} 66%{transform:translate(-30px,40px) scale(0.9);} }
 
-      --up:         #f59e0b;
-      --up-dim:     rgba(245,158,11,0.12);
-      --down:       #ef4444;
-      --down-dim:   rgba(239,68,68,0.12);
-      --amber:      #f59e0b;
-      --amber-dim:  rgba(245,158,11,0.12);
-      --blue:       #3B82F6;
-      --purple:     #8B5CF6;
+/* ─── NEURAL / BLOCKCHAIN NETWORK ─── */
+#neural-network {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  width:100%; height:100%; display:block;
+}
 
-      --t1: #F1F5F9;
-      --t2: #94A3B8;
-      --t3: #4B5563;
-      --t4: #2D3748;
+/* ─── CONTAINER ─── */
+.container { max-width:1140px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+.section-padding { padding:80px 0; }
+@media(max-width:768px){ .section-padding { padding:56px 0; } }
 
-      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-      --font-sans: 'Inter', -apple-system, sans-serif;
+/* ─── NAV ─── */
+.nav { position:fixed; top:0; left:0; right:0; z-index:1000; padding:14px 0; background:rgba(5,8,15,0.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,0.04); transition:var(--transition); }
+.nav.scrolled { border-bottom-color:rgba(245,179,66,0.12); box-shadow:0 4px 30px rgba(0,0,0,0.4); }
+.nav-inner { display:flex; align-items:center; justify-content:space-between; }
+.nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+.nav-logo-icon { width:38px; height:38px; border-radius:10px; background:var(--gradient-gold); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; color:#05080f; box-shadow:0 0 30px rgba(245,179,66,0.25); font-family:var(--font-display); }
+.nav-logo-text { font-size:20px; font-weight:800; letter-spacing:-0.5px; font-family:var(--font-display); }
+.nav-logo-text span { color:var(--accent-gold); }
+.nav-right { display:flex; align-items:center; gap:16px; }
+.nav-links { display:flex; align-items:center; gap:28px; }
+@media(max-width:768px){ .nav-links { display:none; position:absolute; top:100%; left:0; right:0; background:var(--bg-secondary); flex-direction:column; padding:24px; gap:16px; border-bottom:1px solid var(--border-color); } .nav-links.open { display:flex; } }
+.nav-link { color:var(--text-secondary); text-decoration:none; font-size:13.5px; font-weight:500; transition:var(--transition); position:relative; font-family:var(--font-mono); letter-spacing:0.3px; }
+.nav-link:hover { color:var(--text-primary); }
+.nav-link::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--gradient-gold); transition:var(--transition); border-radius:2px; }
+.nav-link:hover::after { width:100%; }
+.lang-toggle { display:flex; gap:4px; background:rgba(255,255,255,0.03); border-radius:8px; padding:3px; border:1px solid var(--border-color); }
+.lang-btn { padding:4px 12px; border:none; border-radius:6px; background:transparent; color:var(--text-muted); font-size:10px; font-weight:700; cursor:pointer; transition:var(--transition); font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.5px; }
+.lang-btn.active { background:var(--accent-gold); color:#05080f; }
+.lang-btn:hover:not(.active) { color:var(--text-primary); }
+.nav-cta { padding:8px 22px; border-radius:8px; background:var(--gradient-gold); color:#05080f; font-weight:700; font-size:12px; border:none; cursor:pointer; transition:var(--transition); text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); letter-spacing:0.3px; }
+.nav-cta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(245,179,66,0.3); }
+.nav-mobile-btn { display:none; background:none; border:none; color:var(--text-primary); font-size:24px; cursor:pointer; padding:4px; }
+@media(max-width:768px){ .nav-mobile-btn { display:block; } .nav-cta { padding:6px 16px; font-size:11px; } }
 
-      --radius: 10px;
-      --radius-sm: 6px;
-    }
+/* ─── HERO ─── */
+.hero { position:relative; z-index:1; min-height:100vh; display:flex; align-items:center; padding:100px 0 60px; }
+.hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+@media(max-width:900px){ .hero-grid { grid-template-columns:1fr; text-align:center; gap:40px; } }
+.hero-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:100px; background:var(--accent-gold-glow); border:1px solid rgba(245,179,66,0.2); font-size:11px; font-weight:600; color:var(--accent-gold); margin-bottom:20px; font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; }
+.hero-badge-dot { width:6px; height:6px; border-radius:50%; background:var(--accent-gold); animation:pulse-dot 1.6s ease-in-out infinite; box-shadow:0 0 12px rgba(245,179,66,0.4); }
+@keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.hero-title { font-family:var(--font-display); font-size:clamp(2.2rem,5.2vw,3.6rem); font-weight:800; line-height:1.1; margin-bottom:16px; letter-spacing:-1px; }
+.hero-title .highlight { background:var(--gradient-gold); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-sub { font-size:clamp(0.95rem,1.2vw,1.05rem); color:var(--text-secondary); max-width:520px; line-height:1.8; margin-bottom:28px; }
+@media(max-width:900px){ .hero-sub { margin-left:auto; margin-right:auto; } }
+.hero-actions { display:flex; gap:14px; flex-wrap:wrap; }
+@media(max-width:900px){ .hero-actions { justify-content:center; } }
+.btn-primary { padding:14px 34px; border-radius:10px; background:var(--gradient-gold); color:#05080f; font-weight:700; font-size:14px; border:none; cursor:pointer; transition:var(--transition); text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); letter-spacing:0.3px; }
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(245,179,66,0.35); }
+.btn-secondary { padding:14px 34px; border-radius:10px; background:transparent; color:var(--text-primary); font-weight:600; font-size:14px; border:1px solid var(--border-color); cursor:pointer; transition:var(--transition); text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+.btn-secondary:hover { border-color:var(--accent-gold); color:var(--accent-gold); background:var(--accent-gold-glow); }
+.hero-stats { display:flex; gap:40px; margin-top:36px; padding-top:28px; border-top:1px solid var(--border-color); }
+@media(max-width:900px){ .hero-stats { justify-content:center; } }
+.hero-stat-value { font-size:28px; font-weight:800; font-family:var(--font-display); background:var(--gradient-gold); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-stat-label { font-size:12px; color:var(--text-muted); font-weight:500; font-family:var(--font-mono); letter-spacing:0.5px; }
 
-    /* ===== RESET ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg-1);
-      color: var(--t1);
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-      position: relative;
-    }
-    a { color: inherit; text-decoration: none; }
-    img { display: block; max-width: 100%; }
-    button { cursor: pointer; border: none; background: none; font: inherit; }
+/* ─── HERO VISUAL ─── */
+.hero-visual { position:relative; display:flex; justify-content:center; align-items:center; }
+.hero-core { width:320px; height:320px; border-radius:50%; position:relative; display:flex; align-items:center; justify-content:center; }
+.hero-core::before { content:''; position:absolute; inset:-20px; border-radius:50%; background:radial-gradient(circle at 35% 30%, rgba(245,179,66,0.15), transparent 70%); animation:pulse-core 4s ease-in-out infinite; }
+@keyframes pulse-core { 0%,100%{transform:scale(1);opacity:0.8;} 50%{transform:scale(1.05);opacity:1;} }
+.hero-core-ring { position:absolute; border-radius:50%; border:1px solid rgba(245,179,66,0.1); animation:spin-slow linear infinite; }
+.hero-core-ring.r1 { inset:-30px; border-color:rgba(245,179,66,0.12); animation-duration:20s; }
+.hero-core-ring.r2 { inset:-60px; border-color:rgba(34,211,238,0.08); animation-duration:30s; animation-direction:reverse; }
+.hero-core-ring.r3 { inset:-90px; border-color:rgba(139,92,246,0.06); animation-duration:40s; }
+.hero-core-ring.r4 { inset:-120px; border-color:rgba(245,179,66,0.04); animation-duration:50s; animation-direction:reverse; }
+@keyframes spin-slow { to { transform:rotate(360deg); } }
+.hero-core-center { position:relative; z-index:2; width:140px; height:140px; border-radius:50%; background:radial-gradient(circle at 40% 30%, #f5b342, #c97d2a); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 0 80px rgba(245,179,66,0.15), inset 0 -20px 40px rgba(0,0,0,0.3); }
+.hero-core-center .main { font-family:var(--font-display); font-size:22px; font-weight:800; color:#05080f; letter-spacing:0.5px; line-height:1.2; }
+.hero-core-center .sub { font-family:var(--font-mono); font-size:9px; color:rgba(5,8,15,0.6); letter-spacing:2px; font-weight:700; }
+.hero-core-orbit { position:absolute; z-index:3; width:36px; height:36px; border-radius:50%; background:var(--bg-card); border:1px solid var(--border-light); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--text-secondary); box-shadow:0 0 20px rgba(0,0,0,0.4); animation:orbit-float 5s ease-in-out infinite; }
+.o1 { top:-12px; left:50%; transform:translateX(-50%); animation-delay:0s; }
+.o2 { bottom:-12px; left:50%; transform:translateX(-50%); animation-delay:-1.6s; }
+.o3 { left:-12px; top:50%; transform:translateY(-50%); animation-delay:-3.2s; }
+.o4 { right:-12px; top:50%; transform:translateY(-50%); animation-delay:-0.8s; }
+@keyframes orbit-float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+.o1,.o3 { animation-name:orbit-float-h; }
+@keyframes orbit-float-h { 0%,100%{transform:translateX(0);} 50%{transform:translateX(-10px);} }
+.o2,.o4 { animation-name:orbit-float-h; }
 
-    /* ===== BACKGROUND NEURAL NETWORK ===== */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-image: 
-        radial-gradient(circle at 20% 50%, rgba(245,158,11,0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(249,115,22,0.03) 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, rgba(239,68,68,0.02) 0%, transparent 50%);
-    }
-    .neural-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.06;
-      background-image: 
-        linear-gradient(0deg, transparent 24%, rgba(245,158,11,0.3) 25%, rgba(245,158,11,0.3) 26%, transparent 27%, transparent 74%, rgba(245,158,11,0.3) 75%, rgba(245,158,11,0.3) 76%, transparent 77%),
-        linear-gradient(90deg, transparent 24%, rgba(249,115,22,0.3) 25%, rgba(249,115,22,0.3) 26%, transparent 27%, transparent 74%, rgba(249,115,22,0.3) 75%, rgba(249,115,22,0.3) 76%, transparent 77%);
-      background-size: 60px 60px;
-    }
-    .neural-bg::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: 
-        radial-gradient(circle at 30% 40%, rgba(245,158,11,0.1) 0%, transparent 30%),
-        radial-gradient(circle at 70% 60%, rgba(239,68,68,0.08) 0%, transparent 35%),
-        radial-gradient(circle at 50% 30%, rgba(249,115,22,0.06) 0%, transparent 25%);
-    }
-    .app {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      min-height: 100vh;
-    }
+/* ─── SECTION HEADER ─── */
+.sec-label { font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--accent-gold); letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; }
+.sec-title { font-family:var(--font-display); font-size:clamp(1.8rem,3.2vw,2.6rem); font-weight:700; line-height:1.2; letter-spacing:-0.5px; }
+.sec-title .highlight { background:var(--gradient-gold); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.sec-desc { color:var(--text-secondary); font-size:1.05rem; max-width:600px; line-height:1.7; margin-top:12px; }
+.sec-header { margin-bottom:48px; }
+@media(max-width:768px){ .sec-header { text-align:center; } .sec-desc { margin-left:auto; margin-right:auto; } }
 
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg-1); }
-    ::-webkit-scrollbar-thumb { background: var(--brand-1); border-radius: 2px; }
+/* ─── MODULES SHOWCASE ─── */
+.modules-showcase { background:var(--bg-secondary); border-radius:var(--radius-lg); padding:48px; border:1px solid var(--border-color); position:relative; overflow:hidden; }
+.modules-showcase::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at 30% 50%, rgba(245,179,66,0.03), transparent 60%); pointer-events:none; }
+@media(max-width:768px){ .modules-showcase { padding:24px; } }
+.modules-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:24px; }
+@media(max-width:600px){ .modules-grid { grid-template-columns:1fr; } }
+.module-item { display:flex; align-items:center; gap:14px; padding:14px 18px; background:var(--bg-card); border-radius:10px; border:1px solid var(--border-color); transition:var(--transition); cursor:default; }
+.module-item:hover { border-color:var(--accent-gold); background:rgba(245,179,66,0.04); transform:translateX(4px); }
+.module-badge { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.module-badge.gold { background:rgba(245,179,66,0.12); border:1px solid rgba(245,179,66,0.2); }
+.module-badge.blue { background:rgba(34,211,238,0.12); border:1px solid rgba(34,211,238,0.2); }
+.module-badge.green { background:rgba(46,209,152,0.12); border:1px solid rgba(46,209,152,0.2); }
+.module-badge.purple { background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.2); }
+.module-name { font-weight:600; font-size:14px; font-family:var(--font-mono); letter-spacing:0.2px; }
+.module-tag { font-size:10px; color:var(--text-muted); font-weight:500; margin-left:auto; padding:2px 10px; border-radius:4px; background:rgba(255,255,255,0.03); font-family:var(--font-mono); letter-spacing:0.5px; text-transform:uppercase; }
 
-    /* ===== LAYOUT ===== */
-    .app { display: flex; min-height: 100vh; }
+/* ─── FEATURES ─── */
+.features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+@media(max-width:900px){ .features-grid { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:600px){ .features-grid { grid-template-columns:1fr; } }
+.feature-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:28px 24px; transition:var(--transition); cursor:default; position:relative; overflow:hidden; }
+.feature-card::before { content:''; position:absolute; inset:0; background:var(--gradient-gold); opacity:0; transition:var(--transition); }
+.feature-card:hover { border-color:var(--accent-gold); transform:translateY(-4px); box-shadow:var(--shadow-card); }
+.feature-card:hover::before { opacity:0.03; }
+.feature-card.highlight { border-color:var(--accent-gold); background:rgba(245,179,66,0.04); }
+.feature-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:16px; background:rgba(245,179,66,0.08); border:1px solid rgba(245,179,66,0.12); position:relative; z-index:1; }
+.feature-title { font-size:16px; font-weight:700; margin-bottom:6px; position:relative; z-index:1; font-family:var(--font-mono); letter-spacing:0.2px; }
+.feature-desc { font-size:13.5px; color:var(--text-secondary); line-height:1.7; position:relative; z-index:1; }
 
-    /* ===== SIDEBAR ===== */
-    .sidebar {
-      width: 220px;
-      flex: none;
-      background: var(--bg-0);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      z-index: 100;
-    }
-    .sidebar-brand {
-      padding: 20px 18px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .brand-icon {
-      width: 32px; height: 32px;
-      background: var(--brand-grad);
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 13px;
-      color: #000;
-      flex: none;
-    }
-    .brand-name {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 18px;
-      letter-spacing: 0.05em;
-      background: var(--brand-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .brand-sub {
-      font-size: 9px;
-      color: var(--t3);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-top: -2px;
-    }
-    .sidebar-nav { padding: 12px 10px; flex: 1; }
-    .nav-section { margin-bottom: 20px; }
-    .nav-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--t3);
-      padding: 0 8px;
-      margin-bottom: 6px;
-    }
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 8px 10px;
-      border-radius: var(--radius-sm);
-      color: var(--t2);
-      font-size: 13px;
-      font-weight: 500;
-      transition: all .15s;
-      margin-bottom: 2px;
-    }
-    .nav-link:hover, .nav-link.active {
-      background: var(--bg-3);
-      color: var(--t1);
-    }
-    .nav-link.active { color: var(--brand-1); }
-    .nav-link svg { opacity: 0.7; flex: none; }
-    .nav-link.active svg { opacity: 1; }
-    .nav-badge {
-      margin-left: auto;
-      background: var(--up-dim);
-      color: var(--brand-1);
-      font-size: 9px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 20px;
-      font-family: var(--font-mono);
-    }
-    .sidebar-footer {
-      padding: 14px 18px;
-      border-top: 1px solid var(--border);
-    }
-    .sidebar-footer a {
-      display: block;
-      font-size: 12px;
-      color: var(--t3);
-      margin-bottom: 6px;
-      transition: color .15s;
-    }
-    .sidebar-footer a:hover { color: var(--brand-1); }
+/* ─── STEPS ─── */
+.steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+@media(max-width:768px){ .steps-grid { grid-template-columns:1fr; gap:16px; } }
+.step-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:32px 24px; text-align:center; transition:var(--transition); position:relative; }
+.step-card::before { content:''; position:absolute; inset:-1px; border-radius:var(--radius); background:var(--gradient-gold); opacity:0; transition:var(--transition); z-index:-1; }
+.step-card:hover { border-color:transparent; transform:translateY(-4px); box-shadow:var(--shadow-card); }
+.step-card:hover::before { opacity:0.08; }
+.step-number { font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--accent-gold); margin-bottom:8px; letter-spacing:2px; }
+.step-title { font-size:17px; font-weight:700; margin-bottom:6px; font-family:var(--font-display); }
+.step-desc { font-size:13.5px; color:var(--text-secondary); line-height:1.7; }
 
-    /* ===== MAIN ===== */
-    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+/* ─── TESTIMONIALS ─── */
+.testimonials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+@media(max-width:900px){ .testimonials-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:600px){ .testimonials-grid { grid-template-columns:1fr; } }
+.testimonial-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius); padding:24px; transition:var(--transition); }
+.testimonial-card:hover { border-color:var(--accent-gold); transform:translateY(-3px); }
+.testimonial-top { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.testimonial-avatar { width:40px; height:40px; border-radius:50%; background:var(--gradient-gold); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+.testimonial-name { font-weight:600; font-size:14px; font-family:var(--font-mono); letter-spacing:0.2px; }
+.testimonial-meta { font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
+.testimonial-stars { color:var(--accent-gold); font-size:12px; margin-left:auto; }
+.testimonial-text { font-size:13.5px; color:var(--text-secondary); line-height:1.7; font-style:italic; }
+.testimonial-result { display:inline-block; margin-top:10px; font-size:11px; color:var(--accent-green); font-family:var(--font-mono); padding:3px 12px; border-radius:4px; background:rgba(46,209,152,0.08); border:1px solid rgba(46,209,152,0.12); letter-spacing:0.3px; }
 
-    /* ===== TOPBAR ===== */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(10,14,26,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      height: 52px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      gap: 16px;
-    }
-    .topbar-menu-btn {
-      display: none;
-      color: var(--t2);
-      padding: 4px;
-    }
-    .topbar-search {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0 10px;
-      height: 32px;
-      flex: 1;
-      max-width: 320px;
-    }
-    .topbar-search svg { color: var(--t3); flex: none; }
-    .topbar-search input {
-      background: none;
-      border: none;
-      outline: none;
-      color: var(--t1);
-      font-family: var(--font-sans);
-      font-size: 13px;
-      width: 100%;
-    }
-    .topbar-search input::placeholder { color: var(--t3); }
-    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--up-dim);
-      border: 1px solid var(--border-hi);
-      color: var(--brand-1);
-      font-size: 11px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-    .live-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--brand-1);
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
+/* ─── FAQ ─── */
+.faq-item { border-bottom:1px solid var(--border-color); }
+.faq-q { display:flex; justify-content:space-between; align-items:center; padding:18px 0; cursor:pointer; font-weight:600; font-size:15px; background:none; border:none; width:100%; text-align:left; color:var(--text-primary); font-family:var(--font-body); transition:var(--transition); }
+.faq-q:hover { color:var(--accent-gold); }
+.faq-q-mark { font-size:22px; transition:transform 0.3s; color:var(--accent-gold); flex-shrink:0; margin-left:16px; font-weight:300; }
+.faq-item.open .faq-q-mark { transform:rotate(45deg); }
+.faq-a { max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+.faq-a p { padding-bottom:18px; color:var(--text-secondary); font-size:13.5px; line-height:1.7; }
 
-    /* ===== TICKER ===== */
-    .ticker {
-      background: var(--bg-0);
-      border-bottom: 1px solid var(--border);
-      height: 36px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-    }
-    .ticker-label {
-      flex: none;
-      padding: 0 14px;
-      font-size: 10px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      color: var(--t3);
-      letter-spacing: 0.08em;
-      border-right: 1px solid var(--border);
-      height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-    .ticker-track-wrap { flex: 1; overflow: hidden; }
-    .ticker-track {
-      display: flex;
-      gap: 0;
-      animation: ticker-scroll 40s linear infinite;
-      white-space: nowrap;
-    }
-    @keyframes ticker-scroll {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .ticker-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 18px;
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      border-right: 1px solid var(--border);
-      height: 36px;
-      color: var(--t2);
-      transition: background .15s;
-    }
-    .ticker-item:hover { background: var(--bg-2); color: var(--t1); }
-    .tsym { font-weight: 700; color: var(--t1); }
-    .tpx { color: var(--t2); }
-    .pct-up { color: var(--brand-1); font-weight: 600; }
-    .pct-dn { color: var(--down); font-weight: 600; }
+/* ─── CTA ─── */
+.cta-section { background:var(--bg-secondary); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); }
+.cta-box { background:linear-gradient(135deg, rgba(245,179,66,0.05), rgba(5,8,15,0.9)); border:1px solid rgba(245,179,66,0.10); border-radius:var(--radius-lg); padding:60px 48px; text-align:center; position:relative; overflow:hidden; }
+.cta-box::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(circle at 50% 50%, rgba(245,179,66,0.04), transparent 60%); animation:cta-glow 20s ease-in-out infinite; }
+@keyframes cta-glow { 0%,100%{transform:translate(0,0);} 50%{transform:translate(5%,5%);} }
+.cta-box > * { position:relative; z-index:1; }
+@media(max-width:768px){ .cta-box { padding:36px 24px; } }
+.cta-title { font-family:var(--font-display); font-size:clamp(1.6rem,3vw,2.2rem); font-weight:700; margin-bottom:12px; letter-spacing:-0.5px; }
+.cta-title .highlight { background:var(--gradient-gold); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.cta-desc { color:var(--text-secondary); font-size:1.05rem; max-width:500px; margin:0 auto 28px; line-height:1.7; }
 
-    /* ===== PAGE CONTENT ===== */
-    .content { flex: 1; padding: 24px 24px 48px; max-width: 1400px; }
-    .shell { max-width: 1400px; }
+/* ─── FOOTER ─── */
+.footer { padding:40px 0 30px; border-top:1px solid var(--border-color); position:relative; z-index:1; }
+.footer-inner { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+.footer-logo { font-size:18px; font-weight:700; letter-spacing:-0.5px; font-family:var(--font-display); }
+.footer-logo span { color:var(--accent-gold); }
+.footer-links { display:flex; gap:24px; flex-wrap:wrap; }
+.footer-links a { color:var(--text-muted); text-decoration:none; font-size:13px; transition:var(--transition); font-family:var(--font-mono); letter-spacing:0.3px; }
+.footer-links a:hover { color:var(--text-primary); }
+.footer-disclaimer { font-size:11.5px; color:var(--text-muted); max-width:700px; line-height:1.7; margin-top:12px; }
+@media(max-width:768px){ .footer-inner { flex-direction:column; text-align:center; } .footer-links { justify-content:center; } }
 
-    /* ===== HERO ===== */
-    .hero { margin-bottom: 32px; }
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 20px;
-      align-items: start;
-    }
-    .hero-eyebrow {
-      font-size: 10px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      background: var(--brand-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .hero h1 {
-      font-size: 36px;
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      margin-bottom: 14px;
-    }
-    .hero h1 .accent {
-      background: var(--brand-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero-desc {
-      font-size: 15px;
-      color: var(--t2);
-      max-width: 520px;
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-    .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--brand-grad);
-      color: #000;
-      font-weight: 700;
-      font-size: 13px;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      transition: all .15s;
-    }
-    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      border: 1px solid var(--border-hi);
-      background: var(--brand-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 600;
-      font-size: 13px;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      transition: all .15s;
-    }
-    .btn-outline:hover { background: var(--brand-dim); }
+/* ─── MODAL ─── */
+.modal { display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.85); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); align-items:center; justify-content:center; padding:20px; }
+.modal.open { display:flex; animation:fade-in 0.3s ease; }
+@keyframes fade-in { from{opacity:0; transform:scale(0.95);} to{opacity:1; transform:scale(1);} }
+.modal-box { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-lg); max-width:420px; width:100%; padding:32px; position:relative; }
+.modal-close { position:absolute; top:12px; right:16px; background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; transition:var(--transition); }
+.modal-close:hover { color:var(--text-primary); }
+.modal-icon { width:56px; height:56px; border-radius:50%; background:var(--accent-gold-glow); border:1px solid rgba(245,179,66,0.2); display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 16px; }
+.modal-title { font-size:20px; font-weight:700; text-align:center; margin-bottom:6px; font-family:var(--font-display); }
+.modal-desc { color:var(--text-secondary); font-size:13.5px; text-align:center; margin-bottom:20px; line-height:1.7; }
+.contact-list { display:flex; flex-direction:column; gap:10px; }
+.contact-item { display:flex; align-items:center; gap:14px; padding:12px 16px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; text-decoration:none; transition:var(--transition); }
+.contact-item:hover { border-color:var(--accent-gold); background:rgba(245,179,66,0.04); }
+.contact-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.contact-icon.zalo { background:rgba(0,104,255,0.12); border:1px solid rgba(0,104,255,0.2); }
+.contact-icon.telegram { background:rgba(34,211,238,0.12); border:1px solid rgba(34,211,238,0.2); }
+.contact-icon.facebook { background:rgba(59,89,152,0.12); border:1px solid rgba(59,89,152,0.2); }
+.contact-info { flex:1; }
+.contact-label { font-weight:600; font-size:13px; font-family:var(--font-mono); letter-spacing:0.2px; }
+.contact-value { font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono); }
+.contact-arrow { color:var(--text-muted); font-size:16px; }
 
-    /* ===== TERMINAL CARD ===== */
-    .terminal-card {
-      background: #0a0e1a;
-      border: 1px solid var(--border-hi);
-      border-radius: var(--radius);
-      padding: 16px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 0 40px rgba(245,158,11,0.05);
-    }
-    .terminal-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--brand-grad);
-    }
-    .terminal-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-    .terminal-dots {
-      display: flex;
-      gap: 6px;
-    }
-    .terminal-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-    }
-    .terminal-dot.red { background: #ef4444; }
-    .terminal-dot.yellow { background: #f59e0b; }
-    .terminal-dot.green { background: #10b981; }
-    .terminal-title {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--t3);
-      margin-left: 8px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    .terminal-body {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      line-height: 1.8;
-      color: var(--t2);
-      max-height: 220px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .terminal-body::-webkit-scrollbar { width: 2px; }
-    .terminal-body::-webkit-scrollbar-thumb { background: var(--brand-1); border-radius: 2px; }
-    .terminal-line {
-      display: flex;
-      gap: 10px;
-      padding: 1px 0;
-    }
-    .terminal-line .prompt {
-      color: var(--brand-1);
-      flex: none;
-    }
-    .terminal-line .cmd { color: var(--t1); }
-    .terminal-line .output { color: var(--t2); }
-    .terminal-line .highlight { color: var(--brand-1); font-weight: 600; }
-    .terminal-line .success { color: #10b981; }
-    .terminal-line .error { color: #ef4444; }
-    .cursor-blink {
-      display: inline-block;
-      width: 8px;
-      height: 14px;
-      background: var(--brand-1);
-      animation: blink 1s step-end infinite;
-      vertical-align: middle;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    /* ===== STAT STRIP ===== */
-    .stat-strip {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      right: 0; height: 2px;
-      background: var(--brand-grad);
-      opacity: 0.6;
-    }
-    .stat-ico {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 10px;
-    }
-    .stat-label { font-size: 11px; color: var(--t3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-    .stat-val { font-size: 22px; font-weight: 800; font-family: var(--font-mono); letter-spacing: -0.02em; }
-    .stat-foot { margin-top: 6px; display: flex; align-items: center; gap: 6px; font-size: 11px; }
-
-    /* ===== SECTION ===== */
-    .section { margin-bottom: 32px; }
-    .section-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      gap: 12px;
-    }
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
-    .section-sub { font-size: 12px; color: var(--t3); margin-top: 3px; }
-    .show-all {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-      color: var(--brand-1);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .show-all:hover { opacity: 0.8; }
-
-    /* ===== CARD ===== */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .card-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--t2);
-    }
-    .card-head .ico { color: var(--brand-1); }
-    .card-head .spacer { flex: 1; }
-    .card-body { padding: 0; }
-
-    /* ===== PRODUCT GRID ===== */
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    .product-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      transition: all .2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .product-card:hover {
-      border-color: var(--border-hi);
-      transform: translateY(-2px);
-    }
-    .product-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at top left, var(--brand-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .product-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 9px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 20px;
-      margin-bottom: 12px;
-    }
-    .product-badge.new { background: var(--up-dim); color: var(--brand-1); border: 1px solid rgba(245,158,11,0.25); }
-    .product-badge.hot { background: var(--down-dim); color: var(--down); border: 1px solid rgba(239,68,68,0.25); }
-    .product-badge.pro { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
-    .product-badge.custom { background: rgba(139,92,246,0.12); color: var(--purple); border: 1px solid rgba(139,92,246,0.25); }
-    .product-name { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; }
-    .product-desc { font-size: 12.5px; color: var(--t2); line-height: 1.6; margin-bottom: 16px; }
-    .product-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .meta-chip {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 3px 8px;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      color: var(--t2);
-    }
-    .product-footer { display: flex; align-items: center; justify-content: space-between; }
-    .product-price { font-size: 15px; font-weight: 800; font-family: var(--font-mono); background: var(--brand-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .product-price .old { font-size: 11px; color: var(--t3); text-decoration: line-through; margin-left: 6px; font-weight: 400; -webkit-text-fill-color: var(--t3); }
-    .btn-sm {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--bg-2);
-      border: 1px solid var(--border-hi);
-      color: var(--brand-1);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 7px 14px;
-      border-radius: var(--radius-sm);
-      transition: all .15s;
-    }
-    .btn-sm:hover { background: var(--up-dim); }
-
-    /* ===== ARTICLE GRID ===== */
-    .article-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    .article-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: all .2s;
-    }
-    .article-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
-    .article-thumb {
-      height: 140px;
-      background: var(--bg-3);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .article-thumb-inner {
-      font-size: 48px;
-      opacity: 0.3;
-    }
-    .article-tag {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 9px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 20px;
-      background: var(--bg-1);
-      border: 1px solid var(--border);
-      color: var(--t2);
-    }
-    .article-body { padding: 14px 16px; }
-    .article-title {
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.4;
-      margin-bottom: 6px;
-    }
-    .article-excerpt { font-size: 12px; color: var(--t2); line-height: 1.6; margin-bottom: 12px; }
-    .article-footer { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--t3); }
-
-    /* ===== FAQ ===== */
-    .faq-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .faq-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      transition: all .2s;
-      cursor: pointer;
-    }
-    .faq-item:hover { border-color: var(--border-hi); }
-    .faq-item .q {
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .faq-item .q::before {
-      content: '▸';
-      color: var(--brand-1);
-      font-size: 14px;
-    }
-    .faq-item .a {
-      font-size: 12.5px;
-      color: var(--t2);
-      line-height: 1.6;
-      padding-left: 22px;
-    }
-
-    /* ===== CONTACT ===== */
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
-    .contact-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
-      transition: all .2s;
-    }
-    .contact-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
-    .contact-card .icon {
-      font-size: 32px;
-      margin-bottom: 10px;
-      display: block;
-    }
-    .contact-card .label {
-      font-size: 11px;
-      color: var(--t3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .contact-card .value {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--t1);
-    }
-    .contact-card .sub {
-      font-size: 12px;
-      color: var(--t2);
-      margin-top: 4px;
-    }
-
-    /* ===== NEWSLETTER ===== */
-    .newsletter {
-      background: var(--bg-card);
-      border: 1px solid var(--border-hi);
-      border-radius: var(--radius);
-      padding: 36px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .newsletter::before {
-      content: '';
-      position: absolute;
-      top: -60px; left: 50%;
-      transform: translateX(-50%);
-      width: 300px; height: 200px;
-      background: radial-gradient(ellipse, var(--brand-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .newsletter .eyebrow {
-      font-size: 10px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      letter-spacing: 0.15em;
-      background: var(--brand-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-    .newsletter h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.01em; }
-    .newsletter p { color: var(--t2); font-size: 14px; margin-bottom: 20px; }
-    .nl-form { display: flex; gap: 10px; max-width: 420px; margin: 0 auto; }
-    .nl-form input {
-      flex: 1;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      color: var(--t1);
-      font-family: var(--font-sans);
-      font-size: 13px;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      outline: none;
-      transition: border-color .15s;
-    }
-    .nl-form input:focus { border-color: var(--border-hi); }
-    .nl-form input::placeholder { color: var(--t3); }
-    .nl-note { font-size: 11px; color: var(--t3); margin-top: 10px; }
-
-    /* ===== FOOTER ===== */
-    .footer {
-      background: var(--bg-0);
-      border-top: 1px solid var(--border);
-      padding: 36px 24px 24px;
-    }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
-      gap: 32px;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding-bottom: 28px;
-      border-bottom: 1px solid var(--border);
-    }
-    .footer h4 {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--t3);
-      margin-bottom: 14px;
-      font-family: var(--font-mono);
-    }
-    .footer a { display: block; font-size: 13px; color: var(--t2); margin-bottom: 8px; transition: color .15s; }
-    .footer a:hover { color: var(--brand-1); }
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 20px;
-      font-size: 12px;
-      color: var(--t3);
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    .socials { display: flex; gap: 10px; margin-top: 14px; }
-    .soc {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      display: grid;
-      place-items: center;
-      color: var(--t2);
-      transition: all .15s;
-    }
-    .soc:hover { border-color: var(--border-hi); color: var(--brand-1); }
-
-    /* ===== UTILITIES ===== */
-    .up-color { color: var(--brand-1); }
-    .dn-color { color: var(--down); }
-    .amber-color { color: var(--brand-1); }
-    .mono-font { font-family: var(--font-mono); }
-
-    /* ===== TWO-COL ===== */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-    /* ===== DỊCH VỤ CHÍNH - HIGHLIGHT ===== */
-    .service-highlight {
-      background: var(--bg-card);
-      border: 1px solid var(--border-hi);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 32px;
-      position: relative;
-      overflow: hidden;
-    }
-    .service-highlight::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      right: 0; height: 3px;
-      background: var(--brand-grad);
-    }
-    .service-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-    .service-item {
-      padding: 20px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      transition: all .2s;
-    }
-    .service-item:hover {
-      border-color: var(--border-hi);
-      transform: translateY(-2px);
-    }
-    .service-item .icon {
-      font-size: 28px;
-      margin-bottom: 10px;
-      display: block;
-    }
-    .service-item h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: var(--brand-grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .service-item p {
-      font-size: 13px;
-      color: var(--t2);
-      line-height: 1.6;
-      margin-bottom: 12px;
-    }
-    .service-item .tag-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .service-item .tag-list span {
-      background: var(--brand-dim);
-      color: var(--brand-1);
-      font-size: 10px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      border: 1px solid rgba(245,158,11,0.15);
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1100px) {
-      .sidebar { width: 56px; }
-      .sidebar .brand-name, .sidebar .brand-sub, .nav-link span, .nav-badge,
-      .nav-label, .sidebar-footer { display: none; }
-      .sidebar-brand { justify-content: center; padding: 16px 8px; }
-      .nav-link { justify-content: center; padding: 8px; }
-      .nav-link svg { opacity: 1; }
-      .hero-grid { grid-template-columns: 1fr; }
-      .product-grid { grid-template-columns: 1fr 1fr; }
-      .stat-strip { grid-template-columns: 1fr 1fr; }
-      .service-grid { grid-template-columns: 1fr; }
-      .faq-grid { grid-template-columns: 1fr; }
-      .contact-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .topbar-menu-btn { display: flex; }
-      .content { padding: 16px; }
-      .product-grid { grid-template-columns: 1fr; }
-      .article-grid { grid-template-columns: 1fr; }
-      .two-col { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr 1fr; }
-      .service-grid { grid-template-columns: 1fr; }
-      .faq-grid { grid-template-columns: 1fr; }
-      .contact-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+/* ─── UTILITIES ─── */
+.reveal { opacity:0; transform:translateY(30px); transition:opacity 0.8s ease, transform 0.8s ease; }
+.reveal.show { opacity:1; transform:translateY(0); }
+.text-center { text-align:center; }
+@media(max-width:480px){ .btn-primary, .btn-secondary { padding:12px 24px; font-size:13px; } }
+</style>
 </head>
 <body>
-<div class="neural-bg"></div>
 
-<div class="app">
+<!-- ─── UNIVERSE BACKGROUND ─── -->
+<div id="universe">
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+  <div class="nebula nebula-3"></div>
+  <div id="stars"></div>
+  <canvas id="neural-network"></canvas>
+</div>
 
-  <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-icon">TC</div>
-      <div>
-        <div class="brand-name">TCODE</div>
-        <div class="brand-sub">Bot Trading</div>
+<!-- ─── NAV ─── -->
+<nav class="nav" id="navbar">
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">TC</div>
+      <div class="nav-logo-text">City<span>Bot</span></div>
+    </a>
+    <div class="nav-right">
+      <div class="nav-links" id="navLinks">
+        <a href="#modules" class="nav-link" data-key="nav_modules">Modules</a>
+        <a href="#features" class="nav-link" data-key="nav_features">Tính năng</a>
+        <a href="#how-it-works" class="nav-link" data-key="nav_how">Cách dùng</a>
+        <a href="#testimonials" class="nav-link" data-key="nav_reviews">Đánh giá</a>
+        <a href="#faq" class="nav-link" data-key="nav_faq">FAQ</a>
+        <button class="nav-cta" onclick="openModal()" data-key="nav_cta">🤖 Dùng thử</button>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" data-lang="vi" onclick="setLang('vi')">VI</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="nav-mobile-btn" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge"><span class="hero-badge-dot"></span><span data-key="hero_badge">TCode · MT5 Expert Advisor</span></div>
+      <h1 class="hero-title" data-key="hero_title">Vũ trụ giao dịch của <span class="highlight">CityBot</span></h1>
+      <p class="hero-sub" data-key="hero_sub">Hệ sinh thái Expert Advisor đa module trên MT5 — Hedging, Scalping, DCA thông minh và công cụ thoát lệnh chính xác. Để CityBot vận hành, bạn tập trung vào chiến lược.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="openModal()" data-key="hero_btn_primary">🤖 Dùng thử ngay</button>
+        <a href="#modules" class="btn-secondary" data-key="hero_btn_secondary">Khám phá →</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-value" data-key="stat_1_value">6+</div><div class="hero-stat-label" data-key="stat_1_label">Module tích hợp</div></div>
+        <div><div class="hero-stat-value" data-key="stat_2_value">24/7</div><div class="hero-stat-label" data-key="stat_2_label">Giao dịch tự động</div></div>
+        <div><div class="hero-stat-value" data-key="stat_3_value">1-Click</div><div class="hero-stat-label" data-key="stat_3_label">Công cụ bán tự động</div></div>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-label">Menu</div>
-        <a class="nav-link active" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L10 4l7 5.5V17a1 1 0 01-1 1h-3v-5H7v5H4a1 1 0 01-1-1V9.5z"/></svg>
-          <span>Trang Chủ</span>
-        </a>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
-          <span>Sản Phẩm Bot</span>
-          <span class="nav-badge">12</span>
-        </a>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <span>Hiệu Suất Bot</span>
-        </a>
-      </div>
-      <div class="nav-section">
-        <div class="nav-label">Kiến Thức</div>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12M4 8h12M4 12h8M4 16h5"/></svg>
-          <span>Bài Viết & Tư Duy</span>
-        </a>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 3-8.5 8.5L3 17l3.5-3.5L15 5zM14.5 5.5l2 2"/></svg>
-          <span>Code Theo Yêu Cầu</span>
-        </a>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h7l3 3v11a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M12 3v4h4"/></svg>
-          <span>Tài Liệu</span>
-        </a>
-      </div>
-      <div class="nav-section">
-        <div class="nav-label">Hỗ Trợ</div>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zM10 12v-1a2 2 0 012-2c1.1 0 2-.9 2-2s-.9-2-2-2a2 2 0 00-2 2M10 14h.01"/></svg>
-          <span>FAQ</span>
-        </a>
-        <a class="nav-link" href="#">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          <span>Liên Hệ</span>
-        </a>
-      </div>
-    </nav>
-    <div class="sidebar-footer">
-      <a href="#">Chính Sách</a>
-      <a href="#">Điều Khoản</a>
-      <a href="#">v2.1.0</a>
-    </div>
-  </aside>
-
-  <!-- ===== MAIN ===== -->
-  <div class="main">
-
-    <!-- Topbar -->
-    <header class="topbar">
-      <button class="topbar-menu-btn">
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h14M3 10h14M3 14h14"/></svg>
-      </button>
-      <div class="topbar-search">
-        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.7"/><path d="M14 14l3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-        <input type="search" placeholder="Tìm kiếm bot, chiến lược, tài liệu…">
-      </div>
-      <div class="topbar-right">
-        <div class="status-pill">
-          <span class="live-dot"></span>
-          HỆ THỐNG HOẠT ĐỘNG
+    <div class="hero-visual">
+      <div class="hero-core">
+        <div class="hero-core-ring r1"></div>
+        <div class="hero-core-ring r2"></div>
+        <div class="hero-core-ring r3"></div>
+        <div class="hero-core-ring r4"></div>
+        <div class="hero-core-center">
+          <span class="main">CityBot</span>
+          <span class="sub">TCode</span>
         </div>
-      </div>
-    </header>
-
-    <!-- Ticker -->
-    <div class="ticker">
-      <div class="ticker-label"><span class="live-dot"></span>BOT SIGNALS</div>
-      <div class="ticker-track-wrap">
-        <div class="ticker-track">
-          <span class="ticker-item"><span class="tsym">EURUSD</span><span class="tpx">1.08542</span><span class="pct-up">▲ +0.12%</span></span>
-          <span class="ticker-item"><span class="tsym">XAUUSD</span><span class="tpx">3,324.50</span><span class="pct-up">▲ +1.34%</span></span>
-          <span class="ticker-item"><span class="tsym">GBPUSD</span><span class="tpx">1.26810</span><span class="pct-dn">▼ -0.08%</span></span>
-          <span class="ticker-item"><span class="tsym">USDJPY</span><span class="tpx">147.32</span><span class="pct-up">▲ +0.23%</span></span>
-          <span class="ticker-item"><span class="tsym">BTCUSD</span><span class="tpx">105,420</span><span class="pct-up">▲ +2.41%</span></span>
-          <span class="ticker-item"><span class="tsym">ETHUSD</span><span class="tpx">3,812</span><span class="pct-dn">▼ -0.54%</span></span>
-          <span class="ticker-item"><span class="tsym">USOIL</span><span class="tpx">68.74</span><span class="pct-dn">▼ -1.02%</span></span>
-          <span class="ticker-item"><span class="tsym">NAS100</span><span class="tpx">19,880</span><span class="pct-up">▲ +0.87%</span></span>
-          <span class="ticker-item"><span class="tsym">SP500</span><span class="tpx">5,640</span><span class="pct-up">▲ +0.44%</span></span>
-          <span class="ticker-item"><span class="tsym">EURUSD</span><span class="tpx">1.08542</span><span class="pct-up">▲ +0.12%</span></span>
-          <span class="ticker-item"><span class="tsym">XAUUSD</span><span class="tpx">3,324.50</span><span class="pct-up">▲ +1.34%</span></span>
-          <span class="ticker-item"><span class="tsym">GBPUSD</span><span class="tpx">1.26810</span><span class="pct-dn">▼ -0.08%</span></span>
-          <span class="ticker-item"><span class="tsym">USDJPY</span><span class="tpx">147.32</span><span class="pct-up">▲ +0.23%</span></span>
-          <span class="ticker-item"><span class="tsym">BTCUSD</span><span class="tpx">105,420</span><span class="pct-up">▲ +2.41%</span></span>
-          <span class="ticker-item"><span class="tsym">ETHUSD</span><span class="tpx">3,812</span><span class="pct-dn">▼ -0.54%</span></span>
-          <span class="ticker-item"><span class="tsym">USOIL</span><span class="tpx">68.74</span><span class="pct-dn">▼ -1.02%</span></span>
-          <span class="ticker-item"><span class="tsym">NAS100</span><span class="tpx">19,880</span><span class="pct-up">▲ +0.87%</span></span>
-          <span class="ticker-item"><span class="tsym">SP500</span><span class="tpx">5,640</span><span class="pct-up">▲ +0.44%</span></span>
-        </div>
+        <div class="hero-core-orbit o1">⚡</div>
+        <div class="hero-core-orbit o2">🛡️</div>
+        <div class="hero-core-orbit o3">💰</div>
+        <div class="hero-core-orbit o4">✂️</div>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- Content -->
-    <div class="content">
-
-      <!-- ===== HERO ===== -->
-      <section class="hero">
-        <div class="hero-grid">
-          <div>
-            <div class="hero-eyebrow">
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
-              TCODE · HỆ SINH THÁI BOT TRADING
-            </div>
-            <h1>Giao Dịch <span class="accent">Tự Động</span><br>Có Hệ Thống & Kỷ Luật</h1>
-            <p class="hero-desc">Chúng tôi phát triển EA & Bot Trading cho Forex, Crypto và Hàng Hóa. Từ bot có sẵn đến code theo yêu cầu — mọi giải pháp tự động hóa giao dịch đều tại TCODE.</p>
-            <div class="hero-cta">
-              <a href="#" class="btn-primary">
-                Xem Sản Phẩm Bot
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </a>
-              <a href="#" class="btn-outline">
-                Code Bot Theo Yêu Cầu
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M5 4l-3 4 3 4M11 4l3 4-3 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Terminal Card -->
-          <div class="terminal-card">
-            <div class="terminal-header">
-              <div class="terminal-dots">
-                <span class="terminal-dot red"></span>
-                <span class="terminal-dot yellow"></span>
-                <span class="terminal-dot green"></span>
-              </div>
-              <span class="terminal-title">TCODE BOT ENGINE v3.2.1</span>
-            </div>
-            <div class="terminal-body">
-              <div class="terminal-line">
-                <span class="prompt">➜</span>
-                <span class="cmd">~ bot-engine init --gold --mode=live</span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Initializing trading engine...</span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Connecting to MT5 Gateway... <span class="success">✓</span></span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Loading strategy: GOLD_BOT_v3</span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Risk management: <span class="highlight">FTMO Compliant</span></span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Backtest validation: <span class="success">PASSED</span></span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Live signal: <span class="highlight">XAUUSD</span> @ 3,324.50</span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">⚡</span>
-                <span class="output">Equity: <span class="highlight">+284.7%</span> | DD: <span class="success">4.2%</span></span>
-              </div>
-              <div class="terminal-line">
-                <span class="prompt">▶</span>
-                <span class="cmd">Bot is running... <span class="cursor-blink"></span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== DỊCH VỤ CHÍNH - HIGHLIGHT ===== -->
-      <div class="service-highlight">
-        <div style="margin-bottom:16px">
-          <h2 style="font-size:18px;font-weight:800;background:var(--brand-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.02em">2 Dịch Vụ Cốt Lõi Của TCODE</h2>
-          <p style="color:var(--t2);font-size:13px;margin-top:4px">Hệ sinh thái bot giao dịch toàn diện — từ sản phẩm có sẵn đến giải pháp riêng biệt</p>
-        </div>
-        <div class="service-grid">
-          <div class="service-item">
-            <span class="icon">⚙️</span>
-            <h3>Code Bot Theo Yêu Cầu</h3>
-            <p>Bạn có ý tưởng chiến lược riêng? Tôi sẽ code thành EA / Bot hoàn chỉnh trên MT4, MT5 hoặc Python. Giao hàng kèm backtest, tài liệu và hỗ trợ cài đặt.</p>
-            <div class="tag-list">
-              <span>MT4 / MT5</span>
-              <span>Python</span>
-              <span>API</span>
-              <span>Backtest</span>
-              <span>Optimize</span>
-            </div>
-          </div>
-          <div class="service-item">
-            <span class="icon">🤖</span>
-            <h3>Hệ Sinh Thái Bot & Tool</h3>
-            <p>Bộ sưu tập bot giao dịch chuyên sâu cho Vàng, Forex, Crypto và Hàng Hóa. Kèm theo dashboard quản lý, indicator và công cụ hỗ trợ phân tích toàn diện.</p>
-            <div class="tag-list">
-              <span>Bot DCA</span>
-              <span>Martingale</span>
-              <span>Hedging</span>
-              <span>Trailing Stop</span>
-              <span>Copy Trade</span>
-            </div>
-          </div>
-        </div>
+<!-- ─── MODULES ─── -->
+<section class="section-padding" id="modules">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-label" data-key="modules_label">Core Modules</div>
+      <h2 class="sec-title" data-key="modules_title">Mọi thứ cần thiết trong <span class="highlight">Một Bot</span></h2>
+      <p class="sec-desc" data-key="modules_desc">CityBot kết hợp 6 module mạnh mẽ, mỗi module thiết kế cho một phong cách giao dịch riêng — từ hedging đến scalping.</p>
+    </div>
+    <div class="modules-showcase reveal">
+      <div class="modules-grid">
+        <div class="module-item"><div class="module-badge gold">🛡️</div><div class="module-name" data-key="mod_hedging">Hedging Pro</div><span class="module-tag" data-key="mod_tag_range">Sideway</span></div>
+        <div class="module-item"><div class="module-badge gold">🌀</div><div class="module-name" data-key="mod_seasonx">Season-X</div><span class="module-tag" data-key="mod_tag_trend">Xu hướng</span></div>
+        <div class="module-item"><div class="module-badge green">💰</div><div class="module-name" data-key="mod_moneytick">Money-TICK</div><span class="module-tag" data-key="mod_tag_scalp">Scalping</span></div>
+        <div class="module-item"><div class="module-badge blue">✂️</div><div class="module-name" data-key="mod_trimming">Tỉa lệnh</div><span class="module-tag" data-key="mod_tag_trim">Đóng thông minh</span></div>
+        <div class="module-item"><div class="module-badge purple">🚀</div><div class="module-name" data-key="mod_exit">Thoát lệnh</div><span class="module-tag" data-key="mod_tag_exit">SL/TP + Trailing</span></div>
+        <div class="module-item"><div class="module-badge green">📊</div><div class="module-name" data-key="mod_zonetrade">Rải lệnh Zone</div><span class="module-tag" data-key="mod_tag_zone">Lệnh chờ</span></div>
       </div>
+    </div>
+  </div>
+</section>
 
-      <!-- ===== STAT STRIP ===== -->
-      <div class="stat-strip">
-        <div class="stat-card" style="--accent-color: var(--brand-1)">
-          <div class="stat-ico" style="background: var(--up-dim)">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--brand-1)" stroke-width="1.7" stroke-linecap="round"><path d="M3 14l4-4 3 3 6-7M13 6h4v4"/></svg>
-          </div>
-          <div class="stat-label">Bot Đang Chạy Thực</div>
-          <div class="stat-val up-color">24</div>
-          <div class="stat-foot">
-            <span class="pct-badge up" style="font-size:10px;padding:2px 6px">+3 T6</span>
-            <span style="color:var(--t3);font-size:11px">EA & Bot</span>
-          </div>
-        </div>
-        <div class="stat-card" style="--accent-color: var(--brand-2)">
-          <div class="stat-ico" style="background: var(--amber-dim)">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--brand-2)" stroke-width="1.7" stroke-linecap="round"><path d="M12 2L4 11h5l-1 7 7-9h-5l1-7z"/></svg>
-          </div>
-          <div class="stat-label">Tổng Tín Hiệu Tháng</div>
-          <div class="stat-val amber-color">1,284</div>
-          <div class="stat-foot">
-            <span style="color:var(--brand-1);font-size:11px;font-weight:700">73.2% Win Rate</span>
-          </div>
-        </div>
-        <div class="stat-card" style="--accent-color: var(--blue)">
-          <div class="stat-ico" style="background: rgba(59,130,246,0.12)">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--blue)" stroke-width="1.7" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-          </div>
-          <div class="stat-label">Khách Hàng Tin Dùng</div>
-          <div class="stat-val" style="color:var(--blue)">380+</div>
-          <div class="stat-foot">
-            <span style="color:var(--t3);font-size:11px">Trader Việt Nam & Quốc Tế</span>
-          </div>
-        </div>
-        <div class="stat-card" style="--accent-color: var(--purple)">
-          <div class="stat-ico" style="background: rgba(139,92,246,0.12)">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="var(--purple)" stroke-width="1.7" stroke-linecap="round"><path d="M12 2l3 3-8.5 8.5L3 17l3.5-3.5L15 5zM14.5 5.5l2 2"/></svg>
-          </div>
-          <div class="stat-label">Bot Đã Giao</div>
-          <div class="stat-val" style="color:var(--purple)">56</div>
-          <div class="stat-foot">
-            <span style="color:var(--t3);font-size:11px">Code theo yêu cầu riêng</span>
-          </div>
-        </div>
+<!-- ─── FEATURES ─── -->
+<section class="section-padding" id="features" style="padding-top:0">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-label" data-key="features_label">Why CityBot</div>
+      <h2 class="sec-title" data-key="features_title">Xây dựng bởi Trader, <span class="highlight">cho Trader</span></h2>
+      <p class="sec-desc" data-key="features_desc">Mỗi module đều được thử nghiệm thực tế và cải tiến dựa trên phản hồi từ cộng đồng TCode.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card highlight reveal"><div class="feature-icon">🧠</div><div class="feature-title" data-key="f1_title">Kiểm soát rủi ro với AI</div><div class="feature-desc" data-key="f1_desc">Tự động tạm dừng giao dịch khi lỗ hoặc khối lượng vượt ngưỡng — bảo vệ tài khoản của bạn.</div></div>
+      <div class="feature-card reveal"><div class="feature-icon">⚡</div><div class="feature-title" data-key="f2_title">Tỉa lệnh thông minh</div><div class="feature-desc" data-key="f2_desc">Đóng vị thế lỗ bằng lợi nhuận từ lệnh đối diện. Nhiều chế độ: đơn, chéo hoặc tỉa toàn bộ.</div></div>
+      <div class="feature-card reveal"><div class="feature-icon">📈</div><div class="feature-title" data-key="f3_title">Điều chỉnh lot động</div><div class="feature-desc" data-key="f3_desc">Money-TICK tự động điều chỉnh khối lượng dựa trên biến động và số dư — không cần tính toán thủ công.</div></div>
+      <div class="feature-card reveal"><div class="feature-icon">🔄</div><div class="feature-title" data-key="f4_title">Tự động chuyển TP</div><div class="feature-desc" data-key="f4_desc">Season-X tự động chuyển giữa chế độ TP gộp và riêng dựa trên số lệnh đang mở.</div></div>
+      <div class="feature-card reveal"><div class="feature-icon">🎯</div><div class="feature-title" data-key="f5_title">Thoát lệnh 1-Click</div><div class="feature-desc" data-key="f5_desc">Đặt SL/TP, trailing stop hoặc hòa vốn chỉ với một cú nhấp. Hỗ trợ lệnh đơn hoặc toàn bộ vị thế.</div></div>
+      <div class="feature-card reveal"><div class="feature-icon">📊</div><div class="feature-title" data-key="f6_title">Rải lệnh Zone</div><div class="feature-desc" data-key="f6_desc">Vẽ vùng trên biểu đồ, thiết lập ngân sách rủi ro và để CityBot tính toán các mức vào lệnh tối ưu.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="section-padding" id="how-it-works" style="background:var(--bg-secondary)">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-label" data-key="how_label">How It Works</div>
+      <h2 class="sec-title" data-key="how_title">Từ bản quyền đến <span class="highlight">Lệnh đầu tiên</span></h2>
+      <p class="sec-desc" data-key="how_desc">Bắt đầu với CityBot rất đơn giản. Làm theo 3 bước và bạn sẽ giao dịch ngay lập tức.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal"><div class="step-number" data-key="step1_num">BƯỚC 01</div><div class="step-title" data-key="step1_title">Nhận bản quyền</div><div class="step-desc" data-key="step1_desc">Liên hệ TCode để yêu cầu bản quyền CityBot. Chúng tôi sẽ gửi file EA và hướng dẫn cài đặt ngay lập tức.</div></div>
+      <div class="step-card reveal"><div class="step-number" data-key="step2_num">BƯỚC 02</div><div class="step-title" data-key="step2_title">Cài đặt & Cấu hình</div><div class="step-desc" data-key="step2_desc">Kéo thả EA lên biểu đồ MT5, thiết lập tham số rủi ro và chọn module mong muốn từ bảng điều khiển.</div></div>
+      <div class="step-card reveal"><div class="step-number" data-key="step3_num">BƯỚC 03</div><div class="step-title" data-key="step3_title">Để Bot chạy</div><div class="step-desc" data-key="step3_desc">CityBot hoạt động 24/7. Công cụ bán tự động cho phép bạn can thiệp thủ công khi cần — kiểm soát toàn diện.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section class="section-padding" id="testimonials">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-label" data-key="test_label">What Traders Say</div>
+      <h2 class="sec-title" data-key="test_title">Được <span class="highlight">1.200+</span> Trader tin tưởng</h2>
+      <p class="sec-desc" data-key="test_desc">Phản hồi thực tế từ người dùng đang sử dụng CityBot hàng ngày để tự động hóa giao dịch của họ.</p>
+    </div>
+    <div class="testimonials-grid" id="testimonialsGrid"></div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section class="section-padding" id="faq" style="background:var(--bg-secondary)">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-label" data-key="faq_label">FAQ</div>
+      <h2 class="sec-title" data-key="faq_title">Câu hỏi <span class="highlight">thường gặp</span></h2>
+    </div>
+    <div class="reveal" id="faqContainer"></div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-section section-padding">
+  <div class="container">
+    <div class="cta-box reveal">
+      <h2 class="cta-title" data-key="cta_title">Sẵn sàng giao dịch với <span class="highlight">CityBot</span>?</h2>
+      <p class="cta-desc" data-key="cta_desc">Nhận bản quyền ngay hôm nay và tham gia cộng đồng trader đang tự động hóa chiến lược của họ với sự tự tin.</p>
+      <button class="btn-primary" onclick="openModal()" style="font-size:15px; padding:16px 40px;" data-key="cta_btn">🤖 Nhận CityBot Ngay</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">City<span>Bot</span> <span style="font-size:12px;color:var(--text-muted);font-weight:400;font-family:var(--font-mono);letter-spacing:1px;">· TCode</span></div>
+      <div class="footer-links">
+        <a href="#modules" data-key="footer_modules">Modules</a>
+        <a href="#how-it-works" data-key="footer_how">Cách dùng</a>
+        <a href="#testimonials" data-key="footer_reviews">Đánh giá</a>
+        <a href="#faq" data-key="footer_faq">FAQ</a>
       </div>
+    </div>
+    <p class="footer-disclaimer" data-key="footer_disclaimer">CityBot là công cụ giao dịch tự động cho MT5, phát triển bởi TCode. Giao dịch tiềm ẩn rủi ro; hiệu suất quá khứ không đảm bảo kết quả tương lai. Luôn sử dụng quản lý rủi ro phù hợp. <br>© 2026 TCode · CityBot. Bảo lưu mọi quyền.</p>
+  </div>
+</footer>
 
-      <!-- ===== SẢN PHẨM BOT ===== -->
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">Sản Phẩm Bot Nổi Bật</h2>
-            <div class="section-sub">EA & Bot tự động cho Forex, Vàng, Crypto — đã qua kiểm định thực chiến</div>
-          </div>
-          <a href="#" class="show-all">Xem tất cả <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        </div>
-        <div class="product-grid">
-
-          <div class="product-card" style="--card-glow:rgba(245,158,11,0.05)">
-            <div class="product-badge hot">🔥 Bán Chạy Nhất</div>
-            <div class="product-name">GOLD BOT v3</div>
-            <div class="product-desc">Bot giao dịch Vàng (XAUUSD) sử dụng chiến lược breakout kết hợp lọc xu hướng đa khung thời gian. Profit Factor 2.41 trên 18 tháng live.</div>
-            <div class="product-meta">
-              <span class="meta-chip">XAUUSD</span>
-              <span class="meta-chip">M15 / H1</span>
-              <span class="meta-chip">MT4 / MT5</span>
-              <span class="meta-chip">DD &lt;5%</span>
-            </div>
-            <div class="product-footer">
-              <div>
-                <div class="product-price">5,000,000đ <span class="old">7,000,000đ</span></div>
-                <div style="font-size:10px;color:var(--brand-1);margin-top:2px">▲ +284.7% · 18 tháng live</div>
-              </div>
-              <a href="#" class="btn-sm">Chi Tiết <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="product-badge new">✦ Mới Ra Mắt</div>
-            <div class="product-name">TREND MASTER v2</div>
-            <div class="product-desc">Bot theo xu hướng cho EURUSD & GBPUSD. Tích hợp AI filter để loại bỏ tín hiệu nhiễu, chỉ vào lệnh khi xác nhận rõ ràng.</div>
-            <div class="product-meta">
-              <span class="meta-chip">EURUSD</span>
-              <span class="meta-chip">GBPUSD</span>
-              <span class="meta-chip">H4 / D1</span>
-              <span class="meta-chip">MT5</span>
-            </div>
-            <div class="product-footer">
-              <div>
-                <div class="product-price">3,500,000đ</div>
-                <div style="font-size:10px;color:var(--t3);margin-top:2px">▲ +67.2% · 6 tháng demo</div>
-              </div>
-              <a href="#" class="btn-sm">Chi Tiết <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
-          </div>
-
-          <div class="product-card" style="--card-glow:rgba(139,92,246,0.05)">
-            <div class="product-badge custom">⌬ Custom</div>
-            <div class="product-name">Code Bot Theo Yêu Cầu</div>
-            <div class="product-desc">Bạn có chiến lược riêng? Chúng tôi code EA / Bot theo thuật toán của bạn. Giao hàng kèm tài liệu, backtest và hỗ trợ cài đặt.</div>
-            <div class="product-meta">
-              <span class="meta-chip">Mọi cặp</span>
-              <span class="meta-chip">MT4 / MT5</span>
-              <span class="meta-chip">Python</span>
-              <span class="meta-chip">API</span>
-            </div>
-            <div class="product-footer">
-              <div>
-                <div class="product-price">Liên Hệ</div>
-                <div style="font-size:10px;color:var(--t3);margin-top:2px">Báo giá trong 24h</div>
-              </div>
-              <a href="#" class="btn-sm">Tư Vấn <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="product-badge pro">⚡ Pro</div>
-            <div class="product-name">SCALP SNIPER v1</div>
-            <div class="product-desc">Bot scalping tốc độ cao cho USDJPY và NAS100. Giao dịch theo vùng Support/Resistance với quản lý rủi ro chặt chẽ, SL cố định.</div>
-            <div class="product-meta">
-              <span class="meta-chip">USDJPY</span>
-              <span class="meta-chip">NAS100</span>
-              <span class="meta-chip">M5 / M15</span>
-              <span class="meta-chip">VPS cần</span>
-            </div>
-            <div class="product-footer">
-              <div>
-                <div class="product-price">2,800,000đ</div>
-                <div style="font-size:10px;color:var(--t3);margin-top:2px">Win Rate 68.5%</div>
-              </div>
-              <a href="#" class="btn-sm">Chi Tiết <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
-          </div>
-
-          <div class="product-card">
-            <div class="product-badge new">✦ Mới</div>
-            <div class="product-name">CRYPTO GRID BOT</div>
-            <div class="product-desc">Bot lưới tự động cho BTC, ETH và BNB trên Binance. Hoạt động 24/7, tự tái tạo lưới theo biến động thị trường.</div>
-            <div class="product-meta">
-              <span class="meta-chip">BTCUSD</span>
-              <span class="meta-chip">ETHUSD</span>
-              <span class="meta-chip">Binance API</span>
-              <span class="meta-chip">Python</span>
-            </div>
-            <div class="product-footer">
-              <div>
-                <div class="product-price">4,200,000đ</div>
-                <div style="font-size:10px;color:var(--t3);margin-top:2px">▲ +38% · 3 tháng</div>
-              </div>
-              <a href="#" class="btn-sm">Chi Tiết <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
-          </div>
-
-          <div class="product-card" style="--card-glow:rgba(245,158,11,0.04)">
-            <div class="product-badge pro">⚡ Pro</div>
-            <div class="product-name">COMMODITY TRADER</div>
-            <div class="product-desc">Bot giao dịch Dầu thô (USOIL) và các hàng hóa theo mùa vụ. Phân tích fundamental tích hợp vào bộ lọc kỹ thuật.</div>
-            <div class="product-meta">
-              <span class="meta-chip">USOIL</span>
-              <span class="meta-chip">UKOIL</span>
-              <span class="meta-chip">H4 / D1</span>
-              <span class="meta-chip">MT5</span>
-            </div>
-            <div class="product-footer">
-              <div>
-                <div class="product-price">3,000,000đ</div>
-                <div style="font-size:10px;color:var(--t3);margin-top:2px">PF 1.88 · backtest 3Y</div>
-              </div>
-              <a href="#" class="btn-sm">Chi Tiết <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ===== BÀI VIẾT ===== -->
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">Tư Duy & Vận Hành Hệ Bot</h2>
-            <div class="section-sub">Kiến thức thực chiến từ trader chạy bot chuyên nghiệp</div>
-          </div>
-          <a href="#" class="show-all">Tất cả bài viết <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        </div>
-        <div class="article-grid">
-
-          <a href="#" class="article-card">
-            <div class="article-thumb">
-              <div class="article-thumb-inner">📊</div>
-              <span class="article-tag">Tư Duy</span>
-            </div>
-            <div class="article-body">
-              <div class="article-title">Portfolio Bot: Tại Sao Không Nên Chỉ Chạy 1 Bot Duy Nhất</div>
-              <div class="article-excerpt">Phân tán rủi ro qua nhiều bot với chiến lược khác nhau là nền tảng để sống sót và tăng trưởng bền vững trong giao dịch tự động. Một bot đơn lẻ dễ gặp rủi ro khi thị trường thay đổi đột ngột.</div>
-              <div class="article-footer">
-                <span>TCODE Team</span>
-                <span>14/06/2026</span>
-              </div>
-            </div>
-          </a>
-
-          <a href="#" class="article-card">
-            <div class="article-thumb">
-              <div class="article-thumb-inner">⚙️</div>
-              <span class="article-tag">Vận Hành</span>
-            </div>
-            <div class="article-body">
-              <div class="article-title">Hướng Dẫn Thiết Lập VPS Tối Ưu Cho EA MetaTrader</div>
-              <div class="article-excerpt">Cấu hình VPS đúng cách ảnh hưởng trực tiếp đến tốc độ khớp lệnh và độ ổn định của bot. Chọn VPS gần broker, latency dưới 10ms, cấu hình tối thiểu 2GB RAM cho 5 bot chạy song song.</div>
-              <div class="article-footer">
-                <span>TCODE Team</span>
-                <span>08/06/2026</span>
-              </div>
-            </div>
-          </a>
-
-          <a href="#" class="article-card">
-            <div class="article-thumb">
-              <div class="article-thumb-inner">🧠</div>
-              <span class="article-tag">Chiến Lược</span>
-            </div>
-            <div class="article-body">
-              <div class="article-title">Drawdown 20%: Dừng Bot Hay Tiếp Tục? Nguyên Tắc Quyết Định</div>
-              <div class="article-excerpt">Biết khi nào cần dừng bot và khi nào cần kiên nhẫn là kỹ năng quan trọng nhất — không phải mã code hay chiến lược entry. Quy tắc 3 lần: nếu DD vượt 20% 3 lần liên tiếp, cần review chiến lược.</div>
-              <div class="article-footer">
-                <span>TCODE Team</span>
-                <span>02/06/2026</span>
-              </div>
-            </div>
-          </a>
-
-        </div>
-      </section>
-
-      <!-- ===== FAQ ===== -->
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">Câu Hỏi Thường Gặp</h2>
-            <div class="section-sub">Những thắc mắc phổ biến về bot trading và dịch vụ của TCODE</div>
-          </div>
-        </div>
-        <div class="faq-grid">
-          <div class="faq-item">
-            <div class="q">Bot có chạy được trên MT4 và MT5 không?</div>
-            <div class="a">Có. TCODE phát triển bot cho cả hai nền tảng MetaTrader 4 và MetaTrader 5. Mỗi bot được tối ưu riêng cho từng platform.</div>
-          </div>
-          <div class="faq-item">
-            <div class="q">Thời gian nhận bot sau khi đặt hàng là bao lâu?</div>
-            <div class="a">Với bot có sẵn: giao ngay trong 24h. Với code theo yêu cầu: thời gian phụ thuộc độ phức tạp, trung bình 3-7 ngày.</div>
-          </div>
-          <div class="faq-item">
-            <div class="q">Có hỗ trợ cài đặt và hướng dẫn sử dụng không?</div>
-            <div class="a">Có. TCODE hỗ trợ cài đặt remote, hướng dẫn chi tiết và tài liệu đi kèm. Hỗ trợ không giới hạn thời gian.</div>
-          </div>
-          <div class="faq-item">
-            <div class="q">Bot có đảm bảo lợi nhuận không?</div>
-            <div class="a">Không ai có thể đảm bảo lợi nhuận 100% trong trading. TCODE cung cấp bot có chiến lược rõ ràng, backtest minh bạch và quản lý rủi ro chặt chẽ.</div>
-          </div>
-          <div class="faq-item">
-            <div class="q">Tôi có thể yêu cầu chỉnh sửa bot sau khi nhận không?</div>
-            <div class="a">Có. TCODE hỗ trợ chỉnh sửa và cập nhật bot miễn phí trong 3 tháng đầu. Sau đó có thể thỏa thuận theo nhu cầu.</div>
-          </div>
-          <div class="faq-item">
-            <div class="q">Bot có chạy 24/7 không? Cần VPS không?</div>
-            <div class="a">Bot chạy 24/7 khi được cài trên VPS. TCODE khuyến nghị dùng VPS để đảm bảo độ ổn định và tránh gián đoạn khi tắt máy tính.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== LIÊN HỆ ===== -->
-      <section class="section">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">Liên Hệ Với TCODE</h2>
-            <div class="section-sub">Sẵn sàng hỗ trợ bạn 24/7 qua các kênh dưới đây</div>
-          </div>
-        </div>
-        <div class="contact-grid">
-          <div class="contact-card">
-            <span class="icon">📞</span>
-            <div class="label">Zalo</div>
-            <div class="value">0964.822.327</div>
-            <div class="sub">Phản hồi trong 5 phút</div>
-          </div>
-          <div class="contact-card">
-            <span class="icon">✉️</span>
-            <div class="label">Gmail</div>
-            <div class="value">tcodefx.auto@gmail.com</div>
-            <div class="sub">Hỗ trợ kỹ thuật & báo giá</div>
-          </div>
-          <div class="contact-card">
-            <span class="icon">💬</span>
-            <div class="label">Telegram</div>
-            <div class="value">@tCode_T95</div>
-            <div class="sub">Kênh cập nhật nhanh nhất</div>
-          </div>
-        </div>
-        <div style="margin-top:12px;text-align:center;padding:16px;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border)">
-          <p style="color:var(--t2);font-size:13px">
-            <span style="font-weight:700;color:var(--brand-1)">Mr TCode</span> — Founder & Lead Developer<br>
-            <span style="font-size:12px;color:var(--t3)">Kết nối để được tư vấn chiến lược bot phù hợp nhất với bạn</span>
-          </p>
-        </div>
-      </section>
-
-      <!-- ===== NEWSLETTER ===== -->
-      <section class="section">
-        <div class="newsletter">
-          <div class="eyebrow">CỘNG ĐỒNG TCODE</div>
-          <h2>Nhận Cập Nhật Bot & Tín Hiệu Mỗi Tuần</h2>
-          <p>Hiệu suất bot thực, bài viết mới, và thông báo sản phẩm — không spam, chỉ giá trị thật.</p>
-          <div class="nl-form">
-            <input type="email" placeholder="Email của bạn…">
-            <button class="btn-primary" type="button">
-              Đăng Ký
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-          <div class="nl-note">Đăng ký đồng nghĩa bạn chấp nhận Chính Sách Bảo Mật của TCODE. Hủy đăng ký bất kỳ lúc nào.</div>
-        </div>
-      </section>
-
-    </div><!-- /.content -->
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="footer">
-      <div class="footer-grid">
-        <div>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-            <div class="brand-icon">TC</div>
-            <div>
-              <div class="brand-name" style="font-size:20px">TCODE</div>
-              <div class="brand-sub">Hệ Sinh Thái Bot Trading</div>
-            </div>
-          </div>
-          <div style="font-size:13px;color:var(--t3);max-width:220px;line-height:1.6">Chuyên gia EA & Bot Trading cho Forex, Vàng và Crypto từ 2020.</div>
-          <div class="socials">
-            <a class="soc" href="#" title="Telegram">
-              <svg width="15" height="15" fill="currentColor" viewBox="0 0 14 12"><path d="M11.606.093s1.174-.457 1.076.654c-.033.458-.326 2.06-.555 3.792l-.782 5.132s-.065.752-.652.883c-.587.13-1.467-.458-1.63-.588-.13-.098-2.445-1.57-3.26-2.289-.229-.196-.49-.588.032-1.046l3.423-3.269c.392-.392.783-1.307-.847-.196L3.846 6.272s-.521.327-1.5.032L.229 5.651s-.783-.49.554-.981c3.26-1.537 7.27-3.106 10.824-4.577Z"/></svg>
-            </a>
-            <a class="soc" href="#" title="Facebook">
-              <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-            </a>
-            <a class="soc" href="#" title="YouTube">
-              <svg width="15" height="15" fill="currentColor" viewBox="0 0 461.001 461.001"><path d="M365.257 67.393H95.744C42.866 67.393 0 110.259 0 163.137v134.728c0 52.878 42.866 95.744 95.744 95.744h269.513c52.878 0 95.744-42.866 95.744-95.744V163.137c0-52.878-42.866-95.744-95.744-95.744zm-64.751 169.663-126.06 60.123c-3.359 1.602-7.239-.847-7.239-4.568V168.607c0-3.774 3.982-6.22 7.348-4.514l126.06 63.881c3.748 1.899 3.683 7.274-.109 9.082z"/></svg>
-            </a>
-            <a class="soc" href="#" title="Zalo">
-              <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.85 1.19 5.42 3.1 7.28L3.5 22l2.85-1.5C7.85 21.46 9.87 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 15H9v-2h4v2zm2-4H9v-2h6v2zm0-4H9V7h6v2z"/></svg>
-            </a>
-          </div>
-        </div>
-        <div>
-          <h4>Sản Phẩm</h4>
-          <a href="#">Bot Vàng (XAUUSD)</a>
-          <a href="#">Bot Forex</a>
-          <a href="#">Bot Crypto</a>
-          <a href="#">Bot Hàng Hóa</a>
-          <a href="#">Code Theo Yêu Cầu</a>
-        </div>
-        <div>
-          <h4>Kiến Thức</h4>
-          <a href="#">Bài Viết & Tư Duy</a>
-          <a href="#">Hướng Dẫn Vận Hành</a>
-          <a href="#">Kết Quả Backtest</a>
-          <a href="#">Video Tutorial</a>
-        </div>
-        <div>
-          <h4>Công Ty</h4>
-          <a href="#">Về TCODE</a>
-          <a href="#">Liên Hệ</a>
-          <a href="#">Cộng Tác Viên</a>
-          <a href="#">Chương Trình Affiliate</a>
-        </div>
-        <div>
-          <h4>Hỗ Trợ</h4>
-          <a href="#">FAQ</a>
-          <a href="#">Chính Sách Hoàn Tiền</a>
-          <a href="#">Điều Khoản Sử Dụng</a>
-          <a href="#">Chính Sách Bảo Mật</a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© 2020–2026 TCODE · Hệ Sinh Thái Bot Trading</span>
-        <span>Kết quả quá khứ không đảm bảo lợi nhuận tương lai. Giao dịch có rủi ro.</span>
-      </div>
-    </footer>
-
-  </div><!-- /.main -->
-</div><!-- /.app -->
+<!-- ─── MODAL ─── -->
+<div class="modal" id="contactModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-icon">🤖</div>
+    <div class="modal-title" data-key="modal_title">Nhận CityBot</div>
+    <p class="modal-desc" data-key="modal_desc">Liên hệ TCode để yêu cầu bản quyền. Chúng tôi sẽ gửi file EA và hướng dẫn cài đặt trong thời gian sớm nhất.</p>
+    <div class="contact-list">
+      <a class="contact-item" href="https://zalo.me/0964822327" target="_blank" rel="noopener">
+        <div class="contact-icon zalo">💬</div>
+        <div class="contact-info"><div class="contact-label" data-key="contact_zalo">Zalo</div><div class="contact-value">0964 822 327</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a class="contact-item" href="https://t.me/tCode_T95" target="_blank" rel="noopener">
+        <div class="contact-icon telegram">✈️</div>
+        <div class="contact-info"><div class="contact-label" data-key="contact_telegram">Telegram</div><div class="contact-value">@tCode_T95</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a class="contact-item" href="https://t.me/TCode_TradingHeBot" target="_blank" rel="noopener">
+        <div class="contact-icon facebook">👥</div>
+        <div class="contact-info"><div class="contact-label" data-key="contact_community">Cộng đồng</div><div class="contact-value">@TCode_TradingHeBot</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a class="contact-item" href="https://tcodedang.github.io/tcode-dev/" target="_blank" rel="noopener">
+        <div class="contact-icon" style="background:rgba(245,179,66,0.12);border:1px solid rgba(245,179,66,0.2);">🌐</div>
+        <div class="contact-info"><div class="contact-label" data-key="contact_website">Website</div><div class="contact-value">TCode Dev</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Keyboard shortcut for search
-    document.addEventListener('keydown', (e) => {
-      if (e.key === '/' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
-        e.preventDefault();
-        document.querySelector('.topbar-search input')?.focus();
-      }
-    });
+// ═══ DATA ═══
+const langData = {
+  vi: {
+    nav_modules: 'Modules',
+    nav_features: 'Tính năng',
+    nav_how: 'Cách dùng',
+    nav_reviews: 'Đánh giá',
+    nav_faq: 'FAQ',
+    nav_cta: '🤖 Dùng thử',
+    hero_badge: 'TCode · MT5 Expert Advisor',
+    hero_title: 'Vũ trụ giao dịch của <span class="highlight">CityBot</span>',
+    hero_sub: 'Hệ sinh thái Expert Advisor đa module trên MT5 — Hedging, Scalping, DCA thông minh và công cụ thoát lệnh chính xác. Để CityBot vận hành, bạn tập trung vào chiến lược.',
+    hero_btn_primary: '🤖 Dùng thử ngay',
+    hero_btn_secondary: 'Khám phá →',
+    stat_1_value: '6+',
+    stat_1_label: 'Module tích hợp',
+    stat_2_value: '24/7',
+    stat_2_label: 'Giao dịch tự động',
+    stat_3_value: '1-Click',
+    stat_3_label: 'Công cụ bán tự động',
+    modules_label: 'Module chính',
+    modules_title: 'Mọi thứ cần thiết trong <span class="highlight">Một Bot</span>',
+    modules_desc: 'CityBot kết hợp 6 module mạnh mẽ, mỗi module thiết kế cho một phong cách giao dịch riêng — từ hedging đến scalping.',
+    mod_hedging: 'Hedging Pro',
+    mod_seasonx: 'Season-X',
+    mod_moneytick: 'Money-TICK',
+    mod_trimming: 'Tỉa lệnh',
+    mod_exit: 'Thoát lệnh',
+    mod_zonetrade: 'Rải lệnh Zone',
+    mod_tag_range: 'Sideway',
+    mod_tag_trend: 'Xu hướng',
+    mod_tag_scalp: 'Scalping',
+    mod_tag_trim: 'Đóng thông minh',
+    mod_tag_exit: 'SL/TP + Trailing',
+    mod_tag_zone: 'Lệnh chờ',
+    features_label: 'Tại sao CityBot',
+    features_title: 'Xây dựng bởi Trader, <span class="highlight">cho Trader</span>',
+    features_desc: 'Mỗi module đều được thử nghiệm thực tế và cải tiến dựa trên phản hồi từ cộng đồng TCode.',
+    f1_title: 'Kiểm soát rủi ro với AI',
+    f1_desc: 'Tự động tạm dừng giao dịch khi lỗ hoặc khối lượng vượt ngưỡng — bảo vệ tài khoản của bạn.',
+    f2_title: 'Tỉa lệnh thông minh',
+    f2_desc: 'Đóng vị thế lỗ bằng lợi nhuận từ lệnh đối diện. Nhiều chế độ: đơn, chéo hoặc tỉa toàn bộ.',
+    f3_title: 'Điều chỉnh lot động',
+    f3_desc: 'Money-TICK tự động điều chỉnh khối lượng dựa trên biến động và số dư — không cần tính toán thủ công.',
+    f4_title: 'Tự động chuyển TP',
+    f4_desc: 'Season-X tự động chuyển giữa chế độ TP gộp và riêng dựa trên số lệnh đang mở.',
+    f5_title: 'Thoát lệnh 1-Click',
+    f5_desc: 'Đặt SL/TP, trailing stop hoặc hòa vốn chỉ với một cú nhấp. Hỗ trợ lệnh đơn hoặc toàn bộ vị thế.',
+    f6_title: 'Rải lệnh Zone',
+    f6_desc: 'Vẽ vùng trên biểu đồ, thiết lập ngân sách rủi ro và để CityBot tính toán các mức vào lệnh tối ưu.',
+    how_label: 'Cách hoạt động',
+    how_title: 'Từ bản quyền đến <span class="highlight">Lệnh đầu tiên</span>',
+    how_desc: 'Bắt đầu với CityBot rất đơn giản. Làm theo 3 bước và bạn sẽ giao dịch ngay lập tức.',
+    step1_num: 'BƯỚC 01',
+    step1_title: 'Nhận bản quyền',
+    step1_desc: 'Liên hệ TCode để yêu cầu bản quyền CityBot. Chúng tôi sẽ gửi file EA và hướng dẫn cài đặt ngay lập tức.',
+    step2_num: 'BƯỚC 02',
+    step2_title: 'Cài đặt & Cấu hình',
+    step2_desc: 'Kéo thả EA lên biểu đồ MT5, thiết lập tham số rủi ro và chọn module mong muốn từ bảng điều khiển.',
+    step3_num: 'BƯỚC 03',
+    step3_title: 'Để Bot chạy',
+    step3_desc: 'CityBot hoạt động 24/7. Công cụ bán tự động cho phép bạn can thiệp thủ công khi cần — kiểm soát toàn diện.',
+    test_label: 'Đánh giá từ Trader',
+    test_title: 'Được <span class="highlight">1.200+</span> Trader tin tưởng',
+    test_desc: 'Phản hồi thực tế từ người dùng đang sử dụng CityBot hàng ngày để tự động hóa giao dịch của họ.',
+    faq_label: 'Câu hỏi thường gặp',
+    faq_title: 'Câu hỏi <span class="highlight">thường gặp</span>',
+    cta_title: 'Sẵn sàng giao dịch với <span class="highlight">CityBot</span>?',
+    cta_desc: 'Nhận bản quyền ngay hôm nay và tham gia cộng đồng trader đang tự động hóa chiến lược của họ với sự tự tin.',
+    cta_btn: '🤖 Nhận CityBot Ngay',
+    footer_modules: 'Modules',
+    footer_how: 'Cách dùng',
+    footer_reviews: 'Đánh giá',
+    footer_faq: 'FAQ',
+    footer_disclaimer: 'CityBot là công cụ giao dịch tự động cho MT5, phát triển bởi TCode. Giao dịch tiềm ẩn rủi ro; hiệu suất quá khứ không đảm bảo kết quả tương lai. Luôn sử dụng quản lý rủi ro phù hợp. <br>© 2026 TCode · CityBot. Bảo lưu mọi quyền.',
+    modal_title: 'Nhận CityBot',
+    modal_desc: 'Liên hệ TCode để yêu cầu bản quyền. Chúng tôi sẽ gửi file EA và hướng dẫn cài đặt trong thời gian sớm nhất.',
+    contact_zalo: 'Zalo',
+    contact_telegram: 'Telegram',
+    contact_community: 'Cộng đồng',
+    contact_website: 'Website'
+  },
+  en: {
+    nav_modules: 'Modules',
+    nav_features: 'Features',
+    nav_how: 'How it works',
+    nav_reviews: 'Reviews',
+    nav_faq: 'FAQ',
+    nav_cta: '🤖 Get Started',
+    hero_badge: 'TCode · MT5 Expert Advisor',
+    hero_title: 'CityBot — <span class="highlight">Your Trading Universe</span>',
+    hero_sub: 'A complete multi-module Expert Advisor ecosystem on MT5 — Hedging, Scalping, Smart DCA, and precision exit tools. Let CityBot operate while you focus on strategy.',
+    hero_btn_primary: '🤖 Try Now',
+    hero_btn_secondary: 'Explore →',
+    stat_1_value: '6+',
+    stat_1_label: 'Built-in Modules',
+    stat_2_value: '24/7',
+    stat_2_label: 'Automated Trading',
+    stat_3_value: '1-Click',
+    stat_3_label: 'Semi-auto Tools',
+    modules_label: 'Core Modules',
+    modules_title: 'Everything You Need in <span class="highlight">One Bot</span>',
+    modules_desc: 'CityBot brings together 6 powerful modules, each designed for a specific trading style — from hedging to scalping.',
+    mod_hedging: 'Hedging Pro',
+    mod_seasonx: 'Season-X',
+    mod_moneytick: 'Money-TICK',
+    mod_trimming: 'Order Trimming',
+    mod_exit: 'Exit Tool',
+    mod_zonetrade: 'Zone Trade',
+    mod_tag_range: 'Ranging',
+    mod_tag_trend: 'Trend',
+    mod_tag_scalp: 'Scalping',
+    mod_tag_trim: 'Smart Close',
+    mod_tag_exit: 'SL/TP + Trailing',
+    mod_tag_zone: 'Pending Orders',
+    features_label: 'Why CityBot',
+    features_title: 'Built by Traders, <span class="highlight">for Traders</span>',
+    features_desc: 'Every module is battle-tested and refined based on real feedback from the TCode community.',
+    f1_title: 'AI-Powered Risk Control',
+    f1_desc: 'Automatically pauses trading when loss or lot size exceeds your preset limits — keeping your account safe.',
+    f2_title: 'Smart Trimming',
+    f2_desc: 'Close losing positions using profits from opposite trades. Multiple modes: single, cross, or full pool trimming.',
+    f3_title: 'Dynamic Lot Sizing',
+    f3_desc: 'Money-TICK automatically adjusts lot sizes based on volatility and account balance — no manual calculations.',
+    f4_title: 'Auto TP Switching',
+    f4_desc: 'Season-X automatically switches between combined and individual TP modes based on the number of open orders.',
+    f5_title: '1-Click Exit Tools',
+    f5_desc: 'Set SL/TP, trailing stop, or break-even with a single click. Supports both single-order and total-position modes.',
+    f6_title: 'Zone Trade',
+    f6_desc: 'Draw a zone on your chart, set your risk budget, and let CityBot calculate the optimal entry levels for pending orders.',
+    how_label: 'How It Works',
+    how_title: 'From License to <span class="highlight">First Trade</span>',
+    how_desc: 'Getting started with CityBot is simple. Follow these three steps and you\'ll be trading in no time.',
+    step1_num: 'STEP 01',
+    step1_title: 'Get Licensed',
+    step1_desc: 'Contact TCode to request a CityBot license. We\'ll send you the EA file and setup instructions instantly.',
+    step2_num: 'STEP 02',
+    step2_title: 'Install & Configure',
+    step2_desc: 'Drop the EA onto your MT5 chart, set your risk parameters, and choose your preferred module from the dashboard.',
+    step3_num: 'STEP 03',
+    step3_title: 'Let It Run',
+    step3_desc: 'CityBot works 24/7. Semi-auto tools let you intervene manually whenever you want — full control when you need it.',
+    test_label: 'What Traders Say',
+    test_title: 'Trusted by <span class="highlight">1,200+</span> Traders',
+    test_desc: 'Real feedback from real users who are using CityBot every day to automate their trading.',
+    faq_label: 'FAQ',
+    faq_title: 'Frequently Asked <span class="highlight">Questions</span>',
+    cta_title: 'Ready to Trade with <span class="highlight">CityBot</span>?',
+    cta_desc: 'Get your license today and join a community of traders who are already automating their strategies with confidence.',
+    cta_btn: '🤖 Get CityBot Now',
+    footer_modules: 'Modules',
+    footer_how: 'How it works',
+    footer_reviews: 'Reviews',
+    footer_faq: 'FAQ',
+    footer_disclaimer: 'CityBot is an automated trading tool for MT5, developed by TCode. Trading involves risk; past performance does not guarantee future results. Always use proper risk management. <br>© 2026 TCode · CityBot. All rights reserved.',
+    modal_title: 'Get CityBot',
+    modal_desc: 'Contact TCode to request a license. We\'ll send you the EA file and setup instructions as soon as possible.',
+    contact_zalo: 'Zalo',
+    contact_telegram: 'Telegram',
+    contact_community: 'Community',
+    contact_website: 'Website'
+  }
+};
 
-    // FAQ toggle
-    document.querySelectorAll('.faq-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const answer = item.querySelector('.a');
-        if (answer) {
-          const isHidden = answer.style.display === 'none';
-          answer.style.display = isHidden ? 'block' : 'none';
-        }
+const testimonialsData = {
+  vi: [
+    { name: 'Hoàng Minh T.', meta: 'Trader · TP.HCM', avatar: '🧑', text: 'Hedging Pro xử lý thị trường sideway hoàn hảo. Tôi chỉ cần thiết lập vùng và để nó chạy — không còn căng thẳng về các cú đảo chiều.', result: 'Sử dụng 4 tháng' },
+    { name: 'Nguyễn Phú V.', meta: 'Swing Trader · Hà Nội', avatar: '👨‍💼', text: 'Season-X là lựa chọn hàng đầu cho những ngày có xu hướng. Tính năng tự động chuyển TP là một bước đột phá — nó thích ứng với điều kiện thị trường.', result: 'Sử dụng 6 tháng' },
+    { name: 'Lê Thị H.', meta: 'Trader mới · Đà Nẵng', avatar: '👩‍💻', text: 'Money-TICK cho scalping với AI điều chỉnh lot giúp tôi quản lý rủi ro mà không cần suy nghĩ quá nhiều về mỗi lần vào lệnh.', result: 'Sử dụng 2 tháng' },
+    { name: 'Trần Quốc B.', meta: 'Trader dày dạn · Cần Thơ', avatar: '🧔', text: 'Trợ lý tỉa lệnh đã giúp tôi đóng vị thế lỗ bằng lợi nhuận từ lệnh thắng — chính xác những gì tôi cần.', result: 'Sử dụng 7 tháng' },
+    { name: 'Phạm Văn K.', meta: 'Trader Crypto · BD', avatar: '👦', text: 'Rải lệnh Zone tiết kiệm rất nhiều thời gian. Vẽ một vùng, nhấp một nút và lệnh chờ được đặt ngay lập tức.', result: 'Sử dụng 5 tháng' },
+    { name: 'Đỗ Anh Q.', meta: 'Day Trader · Vũng Tàu', avatar: '🧑‍💻', text: 'Giao diện CityBot sạch sẽ và trực quan. Tôi có thể chuyển đổi giữa các module trong vài giây mà không cần khởi động lại EA.', result: 'Sử dụng 4 tháng' }
+  ],
+  en: [
+    { name: 'Minh H.', meta: 'Trader · HCMC', avatar: '🧑', text: 'Hedging Pro handles range markets perfectly. I just set the zone and let it run — no more stress about reversals.', result: 'Using for 4 months' },
+    { name: 'Phu V.', meta: 'Swing Trader · Hanoi', avatar: '👨‍💼', text: 'Season-X is my go-to for trend days. The auto TP switch feature is a game-changer — it adapts to market conditions.', result: 'Using for 6 months' },
+    { name: 'Ha L.', meta: 'New Trader · Da Nang', avatar: '👩‍💻', text: 'Money-TICK for scalping with AI lot sizing helps me manage risk without overthinking each entry.', result: 'Using for 2 months' },
+    { name: 'Quoc B.', meta: 'Experienced · Can Tho', avatar: '🧔', text: 'The trimming assistant helped me close a losing position using profits from winners — exactly what I needed.', result: 'Using for 7 months' },
+    { name: 'Van K.', meta: 'Crypto Trader · BD', avatar: '👦', text: 'Zone Trade saves me so much time. Draw a zone, click one button, and pending orders are placed instantly.', result: 'Using for 5 months' },
+    { name: 'Anh Q.', meta: 'Day Trader · Vung Tau', avatar: '🧑‍💻', text: 'CityBot\'s interface is clean and intuitive. I can switch between modules in seconds without restarting the EA.', result: 'Using for 4 months' }
+  ]
+};
+
+const faqData = {
+  vi: [
+    { q: 'CityBot hỗ trợ những thị trường nào?', a: 'CityBot chạy trên MT5, hỗ trợ tất cả các symbol có trên broker của bạn: forex, vàng, crypto, chỉ số, và nhiều hơn nữa.' },
+    { q: 'Tôi có cần kinh nghiệm lập trình không?', a: 'Không. CityBot đi kèm với bảng điều khiển trực quan. Chỉ cần kéo thả EA lên biểu đồ, cấu hình rủi ro và chọn module của bạn.' },
+    { q: 'Sự khác biệt giữa các module là gì?', a: 'Hedging Pro dành cho thị trường sideway, Season-X cho xu hướng, Money-TICK cho scalping, Rải lệnh Zone cho lệnh chờ, và công cụ Thoát/Tỉa lệnh cho can thiệp thủ công.' },
+    { q: 'CityBot có hoạt động trong backtest không?', a: 'Có. Tất cả các module đều tương thích hoàn toàn với MT5 Strategy Tester. Bạn có thể tối ưu tham số và kiểm tra chiến lược trong quá khứ.' },
+    { q: 'Tôi nhận hỗ trợ như thế nào?', a: 'Chúng tôi cung cấp hỗ trợ trực tiếp qua Zalo và Telegram. Bạn sẽ được vào kênh cộng đồng riêng sau khi bản quyền được phê duyệt.' }
+  ],
+  en: [
+    { q: 'What markets does CityBot support?', a: 'CityBot runs on MT5, so it supports all symbols available on your broker: forex, gold, crypto, indices, and more.' },
+    { q: 'Do I need programming experience?', a: 'No. CityBot comes with a user-friendly dashboard. Just drop the EA on your chart, configure your risk settings, and choose your module.' },
+    { q: 'What\'s the difference between modules?', a: 'Hedging Pro is for ranging markets, Season-X for trends, Money-TICK for scalping, Zone Trade for pending orders, and Exit/Trimming tools for manual intervention.' },
+    { q: 'Does CityBot work in backtesting?', a: 'Yes. All modules are fully compatible with the MT5 Strategy Tester. You can optimize parameters and test strategies historically.' },
+    { q: 'How do I get support?', a: 'We provide support directly via Zalo and Telegram. You\'ll get access to a private community channel after your license is approved.' }
+  ]
+};
+
+let currentLang = 'vi';
+
+// ═══ STARS ═══
+function createStars() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 200; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.setProperty('--duration', (3 + Math.random() * 5) + 's');
+    s.style.animationDelay = (Math.random() * 5) + 's';
+    container.appendChild(s);
+  }
+}
+createStars();
+
+// ═══ NEURAL / BLOCKCHAIN NETWORK (interactive canvas) ═══
+(function initNeuralNetwork() {
+  const canvas = document.getElementById('neural-network');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr;
+  let nodes = [];
+  const mouse = { x: -9999, y: -9999, active: false };
+  const LINK_DIST = 150;
+  const MOUSE_DIST = 220;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    initNodes();
+  }
+
+  function initNodes() {
+    const density = (W * H) / 16000;
+    const count = Math.max(28, Math.min(90, Math.round(density)));
+    nodes = [];
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.28,
+        r: 1.2 + Math.random() * 1.6,
+        hue: Math.random() < 0.65 ? 'cyan' : 'gold'
       });
-      // Auto show answers
-      const answer = item.querySelector('.a');
-      if (answer) answer.style.display = 'block';
-    });
+    }
+  }
+
+  function colorFor(hue, alpha) {
+    return hue === 'gold' ? `rgba(245,179,66,${alpha})` : `rgba(34,211,238,${alpha})`;
+  }
+
+  function step() {
+    ctx.clearRect(0, 0, W, H);
+
+    // move + wrap nodes
+    for (const n of nodes) {
+      if (!prefersReduced) {
+        n.x += n.vx;
+        n.y += n.vy;
+      }
+      if (n.x < -20) n.x = W + 20; else if (n.x > W + 20) n.x = -20;
+      if (n.y < -20) n.y = H + 20; else if (n.y > H + 20) n.y = -20;
+
+      // gentle drift toward cursor when nearby (neural pull)
+      if (mouse.active) {
+        const dx = mouse.x - n.x, dy = mouse.y - n.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_DIST && dist > 0.01) {
+          const pull = (1 - dist / MOUSE_DIST) * 0.02;
+          n.x += dx * pull;
+          n.y += dy * pull;
+        }
+      }
+    }
+
+    // draw links between nearby nodes
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < LINK_DIST) {
+          const alpha = (1 - dist / LINK_DIST) * 0.16;
+          ctx.strokeStyle = colorFor('cyan', alpha);
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // draw links + glow from mouse position (network reacts to cursor)
+    if (mouse.active) {
+      for (const n of nodes) {
+        const dx = mouse.x - n.x, dy = mouse.y - n.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_DIST) {
+          const alpha = (1 - dist / MOUSE_DIST) * 0.5;
+          ctx.strokeStyle = colorFor('gold', alpha);
+          ctx.lineWidth = 1.1;
+          ctx.beginPath();
+          ctx.moveTo(mouse.x, mouse.y);
+          ctx.lineTo(n.x, n.y);
+          ctx.stroke();
+        }
+      }
+      const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 60);
+      grad.addColorStop(0, 'rgba(245,179,66,0.35)');
+      grad.addColorStop(1, 'rgba(245,179,66,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, 60, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // draw nodes
+    for (const n of nodes) {
+      ctx.beginPath();
+      ctx.fillStyle = colorFor(n.hue, 0.75);
+      ctx.shadowColor = colorFor(n.hue, 0.9);
+      ctx.shadowBlur = 6;
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.active = true;
   });
+  window.addEventListener('mouseleave', () => { mouse.active = false; });
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches[0]) {
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
+      mouse.active = true;
+    }
+  }, { passive: true });
+  window.addEventListener('touchend', () => { mouse.active = false; });
+
+  resize();
+  requestAnimationFrame(step);
+})();
+
+// ═══ RENDER FUNCTIONS ═══
+function renderTestimonials(lang) {
+  const data = testimonialsData[lang] || testimonialsData.vi;
+  document.getElementById('testimonialsGrid').innerHTML = data.map(t => `
+    <div class="testimonial-card reveal">
+      <div class="testimonial-top">
+        <div class="testimonial-avatar">${t.avatar}</div>
+        <div><div class="testimonial-name">${t.name}</div><div class="testimonial-meta">${t.meta}</div></div>
+        <div class="testimonial-stars">★★★★★</div>
+      </div>
+      <div class="testimonial-text">"${t.text}"</div>
+      <div class="testimonial-result">${t.result}</div>
+    </div>
+  `).join('');
+}
+
+function renderFaq(lang) {
+  const data = faqData[lang] || faqData.vi;
+  document.getElementById('faqContainer').innerHTML = data.map((item, i) => `
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        <span>${item.q}</span>
+        <span class="faq-q-mark">+</span>
+      </button>
+      <div class="faq-a"><p>${item.a}</p></div>
+    </div>
+  `).join('');
+}
+
+// ═══ LANGUAGE ═══
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  const data = langData[lang] || langData.vi;
+
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (key && data[key] !== undefined) {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.value = data[key];
+      } else if (el.tagName === 'BUTTON' && !el.classList.contains('lang-btn')) {
+        el.innerHTML = data[key];
+      } else {
+        el.innerHTML = data[key];
+      }
+    }
+  });
+
+  renderTestimonials(lang);
+  renderFaq(lang);
+}
+
+// ═══ UI FUNCTIONS ═══
+function openModal() { document.getElementById('contactModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal() { document.getElementById('contactModal').classList.remove('open'); document.body.style.overflow = ''; }
+document.querySelector('.modal')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-a').style.maxHeight = null;
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    const a = item.querySelector('.faq-a');
+    a.style.maxHeight = a.scrollHeight + 'px';
+  }
+}
+
+// ═══ REVEAL ON SCROLL ═══
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ═══ NAV SCROLL EFFECT ═══
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ═══ NAV CLOSE ON MOBILE ═══
+document.querySelectorAll('.nav-link, .nav-cta').forEach(el => {
+  el.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+// ═══ INIT ═══
+setLang('vi');
 </script>
 </body>
 </html>
